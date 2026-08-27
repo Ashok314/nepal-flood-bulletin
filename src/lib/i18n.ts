@@ -126,7 +126,7 @@ const en = {
   riverSafetyBody: "Move from the riverside to higher ground and stay on high alert.",
 
   footerDisclaimer:
-    "This is an unofficial, community-maintained bulletin. Information may be incomplete or out of date. Verify critical details independently before acting. Not affiliated with any government body.",
+    "For awareness and information only. This is an unofficial community mirror, not a rescue authority. Information may be incomplete or out of date; verify critical details independently before acting. Not affiliated with any government body.",
   dataMirroredFrom: "Data mirrored from",
   backToTop: "Back to top",
 
@@ -254,7 +254,7 @@ const ne: typeof en = {
   riverSafetyBody: "नदी किनारबाट अग्लो सुरक्षित स्थानमा जानुहोस् र उच्च सतर्क रहनुहोस्।",
 
   footerDisclaimer:
-    "यो अनौपचारिक, समुदायद्वारा सञ्चालित बुलेटिन हो। जानकारी अपूर्ण वा पुरानो हुन सक्छ। कार्य गर्नुअघि महत्त्वपूर्ण विवरण स्वतन्त्र रूपमा पुष्टि गर्नुहोस्। कुनै सरकारी निकायसँग सम्बद्ध छैन।",
+    "जनचेतना र जानकारीका लागि मात्र। यो अनौपचारिक सामुदायिक मिरर हो, उद्धार निकाय होइन। जानकारी अपूर्ण वा पुरानो हुन सक्छ; कार्य गर्नुअघि महत्त्वपूर्ण विवरण स्वतन्त्र रूपमा पुष्टि गर्नुहोस्। कुनै सरकारी निकायसँग सम्बद्ध छैन।",
   dataMirroredFrom: "तथ्याङ्क स्रोत",
   backToTop: "माथि जानुहोस्",
 

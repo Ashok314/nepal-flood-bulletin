@@ -1,13 +1,17 @@
 # Nepal Flood Rescue & Relief Bulletin
 
-A people-focused site for the Nepal (Rasuwa) flood. Its only job is to help
-people **search for and find the missing**, with a searchable list of missing
-and rescued people, live updates from the source, river early-warning, emergency
-contacts, and an official PM Relief Fund donate link.
+A people-focused site for the Nepal (Rasuwa) flood, built purely for
+**awareness and clean information**. It presents public information clearly to
+help spread awareness and help people **search for and find the missing**: a
+searchable list of missing and rescued people, live updates from the source,
+river early-warning, emergency contacts, and an official PM Relief Fund donate
+link.
 
-No database, no login, no admin. The site fetches the community bulletin's live
-JSON feed at request time and caches it in memory. It **never invents or edits**
-entries.
+This is an **unofficial mirror for awareness and information only**. It is not a
+rescue authority and is not affiliated with any government body. No database, no
+login, no admin. The site fetches the community bulletin's live JSON feed at
+request time and caches it in memory, and **never invents or edits** entries.
+Always verify critical details independently before acting.
 
 ## 🙏 Credits
 
