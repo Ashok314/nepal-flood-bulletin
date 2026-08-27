@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { prisma } from "@/lib/db";
 import { isAuthenticated } from "@/lib/auth";
-import { getFeedConfig } from "@/lib/feed";
+import { getFeedConfig, updateFeedConfig } from "@/lib/feed";
 
 export const dynamic = "force-dynamic";
 
@@ -22,8 +21,7 @@ export async function GET() {
   if (!(await isAuthenticated())) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
-  const cfg = await getFeedConfig();
-  return NextResponse.json(present(cfg));
+  return NextResponse.json(present(await getFeedConfig()));
 }
 
 export async function PUT(req: Request) {
@@ -43,10 +41,6 @@ export async function PUT(req: Request) {
       { status: 400 },
     );
   }
-  await getFeedConfig(); // ensure the row exists
-  const cfg = await prisma.feedConfig.update({
-    where: { id: 1 },
-    data: parsed.data,
-  });
+  const cfg = updateFeedConfig(parsed.data);
   return NextResponse.json(present(cfg));
 }

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { prisma } from "@/lib/db";
+import { getPrisma } from "@/lib/db";
 import { isAuthenticated } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
@@ -16,10 +16,19 @@ const CreateBody = z.object({
   order: z.number().int().optional().default(0),
 });
 
+function noDb() {
+  return NextResponse.json(
+    { error: "database not configured" },
+    { status: 503 },
+  );
+}
+
 export async function GET() {
   if (!(await isAuthenticated())) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
+  const prisma = getPrisma();
+  if (!prisma) return noDb();
   const posts = await prisma.curatedPost.findMany({
     orderBy: [{ pinned: "desc" }, { order: "asc" }, { createdAt: "desc" }],
   });
@@ -30,6 +39,8 @@ export async function POST(req: Request) {
   if (!(await isAuthenticated())) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
+  const prisma = getPrisma();
+  if (!prisma) return noDb();
   let data: unknown;
   try {
     data = await req.json();

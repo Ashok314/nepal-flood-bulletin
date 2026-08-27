@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
-import { prisma } from "@/lib/db";
+import { getPrisma } from "@/lib/db";
 import { getFeedConfig, getAllEntriesRaw } from "@/lib/feed";
 import AdminDashboard from "@/components/admin/AdminDashboard";
 
@@ -10,13 +10,22 @@ export default async function AdminPage() {
   const session = await getSession();
   if (!session) redirect("/admin/login");
 
+  const prisma = getPrisma();
   const [posts, cfg, entries, flags] = await Promise.all([
-    prisma.curatedPost.findMany({
-      orderBy: [{ pinned: "desc" }, { order: "asc" }, { createdAt: "desc" }],
-    }),
+    prisma
+      ? prisma.curatedPost
+          .findMany({
+            orderBy: [
+              { pinned: "desc" },
+              { order: "asc" },
+              { createdAt: "desc" },
+            ],
+          })
+          .catch(() => [])
+      : Promise.resolve([]),
     getFeedConfig(),
     getAllEntriesRaw(),
-    prisma.moderationFlag.findMany(),
+    prisma ? prisma.moderationFlag.findMany().catch(() => []) : Promise.resolve([]),
   ]);
 
   const configSafe = {

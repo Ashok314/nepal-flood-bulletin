@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { prisma } from "@/lib/db";
+import { getPrisma } from "@/lib/db";
 import { SITE } from "@/lib/config";
 
 // ---------- Upstream JSON schema (kept lenient; we never reject the whole feed
@@ -84,18 +84,39 @@ let lastAttemptMs = 0;
 const MIN_ATTEMPT_GAP_MS = 30_000; // throttle background refetch attempts
 const FETCH_TIMEOUT_MS = 8_000;
 
-// ---------- Config singleton ----------
+// ---------- In-memory feed config + snapshot (no DB required) ----------
 
-export async function getFeedConfig() {
-  return prisma.feedConfig.upsert({
-    where: { id: 1 },
-    create: {
-      id: 1,
-      feedUrl: SITE.defaultFeedUrl,
-      backupFeedUrl: SITE.backupFeedUrl,
-    },
-    update: {},
-  });
+type FeedConfigShape = {
+  id: number;
+  feedUrl: string;
+  backupFeedUrl: string;
+  refreshInterval: number;
+  lastFetchedAt: Date | null;
+  lastStatus: "ok" | "error" | "never";
+  lastError: string;
+  lastGoodPayload: string;
+};
+
+const feedState: FeedConfigShape = {
+  id: 1,
+  feedUrl: SITE.defaultFeedUrl,
+  backupFeedUrl: SITE.backupFeedUrl,
+  refreshInterval: 300,
+  lastFetchedAt: null,
+  lastStatus: "never",
+  lastError: "",
+  lastGoodPayload: "",
+};
+
+export async function getFeedConfig(): Promise<FeedConfigShape> {
+  return feedState;
+}
+
+export function updateFeedConfig(
+  patch: Partial<Omit<FeedConfigShape, "id" | "lastGoodPayload">>,
+): FeedConfigShape {
+  Object.assign(feedState, patch);
+  return feedState;
 }
 
 // ---------- Fetch + cache ----------
@@ -118,27 +139,19 @@ async function fetchJson(url: string): Promise<string> {
 
 /** Fetch the upstream feed, validate it, and store the snapshot. Throws on failure. */
 export async function fetchAndCache(): Promise<void> {
-  const cfg = await getFeedConfig();
   lastAttemptMs = Date.now();
   try {
-    const text = await fetchJson(cfg.feedUrl);
+    const text = await fetchJson(feedState.feedUrl);
     const json = JSON.parse(text);
     FeedSchema.parse(json); // validate shape; throws if wildly wrong
-    await prisma.feedConfig.update({
-      where: { id: 1 },
-      data: {
-        lastGoodPayload: text,
-        lastFetchedAt: new Date(),
-        lastStatus: "ok",
-        lastError: "",
-      },
-    });
+    feedState.lastGoodPayload = text;
+    feedState.lastFetchedAt = new Date();
+    feedState.lastStatus = "ok";
+    feedState.lastError = "";
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
-    await prisma.feedConfig.update({
-      where: { id: 1 },
-      data: { lastStatus: "error", lastError: message },
-    });
+    feedState.lastStatus = "error";
+    feedState.lastError = message;
     throw err;
   }
 }
@@ -155,8 +168,14 @@ function maybeBackgroundRefresh() {
 // ---------- Moderation overlay ----------
 
 async function getModerationMap(): Promise<Map<string, string>> {
-  const flags = await prisma.moderationFlag.findMany();
-  return new Map(flags.map((f) => [f.entryId, f.action]));
+  const prisma = getPrisma();
+  if (!prisma) return new Map();
+  try {
+    const flags = await prisma.moderationFlag.findMany();
+    return new Map(flags.map((f) => [f.entryId, f.action]));
+  } catch {
+    return new Map();
+  }
 }
 
 function normalizeEntry(

@@ -115,6 +115,8 @@ const en = {
   mapEntry: "Upstream / entry",
   mapDisclaimer:
     "Pins and paths are approximate (market / bridge points, not the exact channel). Verify with DHM and local authorities.",
+  mapRain: "Rain radar",
+  mapRainNote: "Live rain radar by RainViewer — toggle it top-right on the map.",
   riverSafetyTitle: "Request to people living near the river.",
   riverSafetyBody: "Move from the riverside to higher ground and stay on high alert.",
 
@@ -237,6 +239,8 @@ const ne: typeof en = {
   mapEntry: "माथिल्लो / प्रवेश",
   mapDisclaimer:
     "पिन र मार्ग अनुमानित हुन् (बजार/पुल बिन्दु, ठ्याक्कै नदी बहाव होइन)। DHM र स्थानीय अधिकारीसँग पुष्टि गर्नुहोस्।",
+  mapRain: "वर्षा राडार",
+  mapRainNote: "RainViewer द्वारा प्रत्यक्ष वर्षा राडार — नक्साको दायाँ-माथिबाट टगल गर्नुहोस्।",
   riverSafetyTitle: "नदी किनारमा बस्ने जनतालाई अनुरोध।",
   riverSafetyBody: "नदी किनारबाट अग्लो सुरक्षित स्थानमा जानुहोस् र उच्च सतर्क रहनुहोस्।",
 

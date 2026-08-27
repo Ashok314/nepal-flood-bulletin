@@ -48,6 +48,22 @@ Then open:
 
 Data (SQLite DB + cached feed) persists in the `angel-data` Docker volume.
 
+## Deploy to Vercel (free tier)
+
+The public site runs on Vercel with **no database** — the flood feed and river
+data are fetched at request time and cached in memory, so nothing needs a
+writable disk. Just import the repo into Vercel and deploy; the default build
+(`prisma generate && next build`) works as-is.
+
+- **No `DATABASE_URL` needed** for the public site. (SQLite can't be used on
+  Vercel — its filesystem is read-only.)
+- The **admin panel** (curated posts + moderation) needs a hosted database.
+  To enable it, attach a serverless DB — **[Neon](https://neon.tech)** Postgres
+  or **[Turso](https://turso.tech)** (libSQL/SQLite) both have free tiers — set
+  `DATABASE_URL` (and `ADMIN_USER`, `ADMIN_PASSWORD`, `SESSION_SECRET`) in
+  Vercel's env, and switch the Prisma `datasource` provider accordingly. Without
+  it, admin routes return `503` and the public site is unaffected.
+
 ## Local development (without Docker)
 
 ```bash

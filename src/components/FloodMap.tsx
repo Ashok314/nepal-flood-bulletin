@@ -38,7 +38,7 @@ export default function FloodMap({
   useEffect(() => {
     let cancelled = false;
 
-    import("leaflet").then((mod) => {
+    import("leaflet").then(async (mod) => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const L: any = (mod as any).default ?? mod;
       if (cancelled || !elRef.current || mapRef.current) return;
@@ -127,6 +127,39 @@ export default function FloodMap({
         ...gaugePoints,
       ]);
       map.fitBounds(bounds, { padding: [30, 30] });
+
+      // Live rain radar (RainViewer — free, no API key). Optional: the map
+      // works without it if the request fails.
+      try {
+        const rv = await fetch(
+          "https://api.rainviewer.com/public/weather-maps.json",
+        ).then((r) => r.json());
+        if (!cancelled && mapRef.current && rv?.host) {
+          const past = rv.radar?.past ?? [];
+          const nowcast = rv.radar?.nowcast ?? [];
+          const frame = past[past.length - 1] ?? nowcast[0];
+          if (frame?.path) {
+            const rain = L.tileLayer(
+              `${rv.host}${frame.path}/256/{z}/{x}/{y}/2/1_1.png`,
+              {
+                opacity: 0.6,
+                zIndex: 5,
+                attribution: "Rain &copy; RainViewer",
+              },
+            );
+            rain.addTo(map);
+            L.control
+              .layers(
+                null,
+                { [m.mapRain]: rain },
+                { collapsed: false, position: "topright" },
+              )
+              .addTo(map);
+          }
+        }
+      } catch {
+        /* radar overlay is optional */
+      }
     });
 
     return () => {

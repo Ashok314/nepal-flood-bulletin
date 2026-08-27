@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/db";
+import { getPrisma } from "@/lib/db";
 import { getFeed } from "@/lib/feed";
 import { getRivers } from "@/lib/rivers";
 import { deriveKpis } from "@/lib/metrics";
@@ -26,13 +26,22 @@ export default async function Page({
   const lang: Lang = isLang(searchParams.lang) ? searchParams.lang : "en";
   const m = getMessages(lang);
 
+  const prisma = getPrisma();
   const [feed, rivers, rawPosts] = await Promise.all([
     getFeed(),
     getRivers(),
-    prisma.curatedPost.findMany({
-      where: { published: true },
-      orderBy: [{ pinned: "desc" }, { order: "asc" }, { createdAt: "desc" }],
-    }),
+    prisma
+      ? prisma.curatedPost
+          .findMany({
+            where: { published: true },
+            orderBy: [
+              { pinned: "desc" },
+              { order: "asc" },
+              { createdAt: "desc" },
+            ],
+          })
+          .catch(() => [])
+      : Promise.resolve([]),
   ]);
 
   const kpis = deriveKpis(feed, rivers);
@@ -98,6 +107,7 @@ export default async function Page({
             </span>
           </div>
           <p className="mt-2 text-[11px] text-slate-400">{m.mapDisclaimer}</p>
+          <p className="mt-1 text-[11px] text-slate-400">🌧 {m.mapRainNote}</p>
 
           {/* Safety call to action */}
           <div className="mt-4 rounded-lg border border-rose-300 bg-rose-50 px-4 py-3 text-sm">
