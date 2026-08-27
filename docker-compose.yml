@@ -1,0 +1,22 @@
+services:
+  web:
+    build: .
+    image: nepal-flood-bulletin:latest
+    container_name: nepal-flood-bulletin
+    ports:
+      - "3000:3000"
+    environment:
+      # SQLite lives on the mounted volume so data survives restarts.
+      DATABASE_URL: "file:/data/app.db"
+      # ---- CHANGE THESE before any real deployment ----
+      ADMIN_USER: "admin"
+      ADMIN_PASSWORD: "changeme"
+      SESSION_SECRET: "change-this-to-a-long-random-string-please"
+      # Set to "true" only when served over HTTPS.
+      COOKIE_SECURE: "false"
+    volumes:
+      - angel-data:/data
+    restart: unless-stopped
+
+volumes:
+  angel-data:

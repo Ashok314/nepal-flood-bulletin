@@ -1,0 +1,275 @@
+"use client";
+
+import { useEffect, useMemo, useRef, useState } from "react";
+import type { Person } from "@/lib/feed";
+import type { Messages } from "@/lib/i18n";
+import PersonCard from "./PersonCard";
+
+type Tab = "missing" | "found";
+
+const PAGE_SIZE = 24;
+
+export default function SearchRescue({
+  m,
+  missing,
+  found,
+  forms,
+}: {
+  m: Messages;
+  missing: Person[];
+  found: Person[];
+  forms: { missing: string | null; found: string | null };
+}) {
+  const [tab, setTab] = useState<Tab>("missing");
+  const [q, setQ] = useState("");
+  const [page, setPage] = useState(1);
+  const topRef = useRef<HTMLDivElement>(null);
+
+  const list = tab === "missing" ? missing : found;
+
+  const filtered = useMemo(() => {
+    const s = q.trim().toLowerCase();
+    if (!s) return list;
+    return list.filter((p) =>
+      [p.name, p.place, p.phone, p.note, p.when]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase()
+        .includes(s),
+    );
+  }, [q, list]);
+
+  // Reset to first page whenever the query or tab changes.
+  useEffect(() => {
+    setPage(1);
+  }, [q, tab]);
+
+  const total = filtered.length;
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const current = Math.min(page, totalPages);
+  const start = (current - 1) * PAGE_SIZE;
+  const pageItems = filtered.slice(start, start + PAGE_SIZE);
+
+  function goTo(p: number) {
+    setPage(p);
+    topRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  return (
+    <div ref={topRef}>
+      {/* Controls */}
+      <div className="mb-4 flex flex-wrap items-center gap-2">
+        <div className="inline-flex rounded-lg border border-slate-200 bg-white p-1 shadow-sm">
+          <TabButton active={tab === "missing"} onClick={() => setTab("missing")}>
+            {m.tabMissing}
+            <Count active={tab === "missing"} n={missing.length} tone="rose" />
+          </TabButton>
+          <TabButton active={tab === "found"} onClick={() => setTab("found")}>
+            {m.tabFound}
+            <Count active={tab === "found"} n={found.length} tone="emerald" />
+          </TabButton>
+        </div>
+
+        <div className="ml-auto flex flex-wrap gap-2">
+          {forms.missing && (
+            <a
+              href={forms.missing}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-md bg-rose-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-rose-700"
+            >
+              + {m.reportMissing}
+            </a>
+          )}
+          {forms.found && (
+            <a
+              href={forms.found}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-md bg-emerald-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700"
+            >
+              + {m.reportFound}
+            </a>
+          )}
+        </div>
+      </div>
+
+      {/* Search */}
+      <div className="relative mb-3">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+          aria-hidden
+        >
+          <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="1.8" />
+          <path d="M20 20l-3.2-3.2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+        </svg>
+        <input
+          type="search"
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          placeholder={m.searchPlaceholder}
+          className="w-full rounded-lg border border-slate-300 bg-white py-2.5 pl-10 pr-10 text-sm shadow-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20"
+        />
+        {q && (
+          <button
+            type="button"
+            onClick={() => setQ("")}
+            aria-label="Clear search"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+          >
+            ✕
+          </button>
+        )}
+      </div>
+
+      {/* Result summary */}
+      <p className="mb-3 text-sm text-slate-500">
+        {total === 0
+          ? m.noResults
+          : `${m.showing} ${start + 1}–${start + pageItems.length} ${m.of} ${total} ${m.resultsCount}`}
+      </p>
+
+      {total === 0 ? (
+        <p className="rounded-lg border border-dashed border-slate-300 bg-white p-8 text-center text-slate-500">
+          {m.noResults}
+        </p>
+      ) : (
+        <>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {pageItems.map((p) => (
+              <PersonCard key={p.id} person={p} m={m} />
+            ))}
+          </div>
+
+          {totalPages > 1 && (
+            <Pagination current={current} totalPages={totalPages} onGo={goTo} m={m} />
+          )}
+        </>
+      )}
+    </div>
+  );
+}
+
+/* ---------------- Pagination ---------------- */
+
+function pageWindow(current: number, total: number): (number | "…")[] {
+  const delta = 1;
+  const pages: number[] = [];
+  for (let i = 1; i <= total; i++) {
+    if (i === 1 || i === total || (i >= current - delta && i <= current + delta)) {
+      pages.push(i);
+    }
+  }
+  const out: (number | "…")[] = [];
+  let prev = 0;
+  for (const p of pages) {
+    if (prev) {
+      if (p - prev === 2) out.push(prev + 1);
+      else if (p - prev > 2) out.push("…");
+    }
+    out.push(p);
+    prev = p;
+  }
+  return out;
+}
+
+function Pagination({
+  current,
+  totalPages,
+  onGo,
+  m,
+}: {
+  current: number;
+  totalPages: number;
+  onGo: (p: number) => void;
+  m: Messages;
+}) {
+  const items = pageWindow(current, totalPages);
+  return (
+    <nav className="mt-6 flex flex-wrap items-center justify-center gap-1.5" aria-label="Pagination">
+      <PageBtn disabled={current === 1} onClick={() => onGo(current - 1)}>
+        ‹ {m.prev}
+      </PageBtn>
+      {items.map((it, i) =>
+        it === "…" ? (
+          <span key={`d${i}`} className="px-2 text-slate-400">
+            …
+          </span>
+        ) : (
+          <PageBtn key={it} active={it === current} onClick={() => onGo(it)}>
+            {it}
+          </PageBtn>
+        ),
+      )}
+      <PageBtn disabled={current === totalPages} onClick={() => onGo(current + 1)}>
+        {m.next} ›
+      </PageBtn>
+    </nav>
+  );
+}
+
+function PageBtn({
+  children,
+  onClick,
+  active,
+  disabled,
+}: {
+  children: React.ReactNode;
+  onClick?: () => void;
+  active?: boolean;
+  disabled?: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      className={`min-w-[2.25rem] rounded-md border px-2.5 py-1.5 text-sm font-medium transition ${
+        active
+          ? "border-brand bg-brand text-white"
+          : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+      } disabled:cursor-not-allowed disabled:opacity-40`}
+    >
+      {children}
+    </button>
+  );
+}
+
+/* ---------------- Tabs ---------------- */
+
+function TabButton({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`flex items-center rounded-md px-3 py-1.5 text-sm font-semibold transition ${
+        active ? "bg-brand text-white" : "text-slate-600 hover:bg-slate-100"
+      }`}
+    >
+      {children}
+    </button>
+  );
+}
+
+function Count({ n, active, tone }: { n: number; active: boolean; tone: "rose" | "emerald" }) {
+  const toneCls = active
+    ? "bg-white/25 text-white"
+    : tone === "rose"
+      ? "bg-rose-100 text-rose-700"
+      : "bg-emerald-100 text-emerald-700";
+  return (
+    <span className={`ml-1.5 rounded-full px-1.5 py-0.5 text-[11px] font-bold ${toneCls}`}>
+      {n}
+    </span>
+  );
+}
