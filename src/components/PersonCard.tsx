@@ -1,6 +1,6 @@
 import type { Person } from "@/lib/feed";
-import type { Messages } from "@/lib/i18n";
-import { splitPhones, telHref } from "@/lib/format";
+import type { Lang, Messages } from "@/lib/i18n";
+import { splitPhones, telHref, timeAgo } from "@/lib/format";
 import { personTags } from "@/lib/derive";
 
 const ic = "h-3.5 w-3.5 shrink-0 text-slate-400";
@@ -81,7 +81,15 @@ function Tag({ tone, children }: { tone: string; children: React.ReactNode }) {
   );
 }
 
-export default function PersonCard({ person, m }: { person: Person; m: Messages }) {
+export default function PersonCard({
+  person,
+  m,
+  lang,
+}: {
+  person: Person;
+  m: Messages;
+  lang: Lang;
+}) {
   const phones = splitPhones(person.phone);
   const isFound = person.status === "found";
   const tags = personTags(person);
@@ -166,6 +174,12 @@ export default function PersonCard({ person, m }: { person: Person; m: Messages 
               </a>
             ))}
           </div>
+        )}
+
+        {person.reportedAt && (
+          <p className="mt-2 flex items-center gap-1 text-[11px] text-slate-400">
+            🕘 {m.reportedLabel} {timeAgo(person.reportedAt, lang)}
+          </p>
         )}
       </div>
     </div>

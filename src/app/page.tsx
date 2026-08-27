@@ -1,11 +1,13 @@
 import { getPrisma } from "@/lib/db";
 import { getFeed } from "@/lib/feed";
 import { getRivers } from "@/lib/rivers";
+import { getRecentUpdates } from "@/lib/updates";
 import { deriveKpis } from "@/lib/metrics";
 import { getMessages, isLang, type Lang } from "@/lib/i18n";
 import CreditBar from "@/components/CreditBar";
 import Hero from "@/components/Hero";
 import KpiHeader from "@/components/KpiHeader";
+import RecentUpdates from "@/components/RecentUpdates";
 import RiverWatch from "@/components/RiverWatch";
 import FloodMap from "@/components/FloodMap";
 import SearchRescue from "@/components/SearchRescue";
@@ -27,9 +29,10 @@ export default async function Page({
   const m = getMessages(lang);
 
   const prisma = getPrisma();
-  const [feed, rivers, rawPosts] = await Promise.all([
+  const [feed, rivers, updates, rawPosts] = await Promise.all([
     getFeed(),
     getRivers(),
+    getRecentUpdates(),
     prisma
       ? prisma.curatedPost
           .findMany({
@@ -73,6 +76,8 @@ export default async function Page({
       <KpiHeader lang={lang} m={m} kpis={kpis} />
 
       <main>
+        <RecentUpdates lang={lang} m={m} items={updates} />
+
         <RiverWatch lang={lang} m={m} rivers={rivers} />
 
         <section id="map" className="mx-auto max-w-6xl px-4 pb-10">
@@ -125,6 +130,7 @@ export default async function Page({
           <div className="mt-5">
             <SearchRescue
               m={m}
+              lang={lang}
               missing={feed.missing}
               found={feed.found}
               forms={feed.forms}

@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Person } from "@/lib/feed";
-import type { Messages } from "@/lib/i18n";
+import type { Lang, Messages } from "@/lib/i18n";
 import PersonCard from "./PersonCard";
 
 type Tab = "missing" | "found";
@@ -11,11 +11,13 @@ const PAGE_SIZE = 24;
 
 export default function SearchRescue({
   m,
+  lang,
   missing,
   found,
   forms,
 }: {
   m: Messages;
+  lang: Lang;
   missing: Person[];
   found: Person[];
   forms: { missing: string | null; found: string | null };
@@ -139,7 +141,7 @@ export default function SearchRescue({
         <>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {pageItems.map((p) => (
-              <PersonCard key={p.id} person={p} m={m} />
+              <PersonCard key={p.id} person={p} m={m} lang={lang} />
             ))}
           </div>
 

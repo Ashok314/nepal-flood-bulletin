@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { getPrisma } from "@/lib/db";
 import { SITE } from "@/lib/config";
+import { parseReportTime } from "@/lib/derive";
 
 // ---------- Upstream JSON schema (kept lenient; we never reject the whole feed
 // because one entry is odd) ----------
@@ -58,6 +59,7 @@ export type Person = {
   when?: string;
   note?: string;
   photo?: string;
+  reportedAt?: string; // ISO time this report was filed (from the entry id)
   status: PersonStatus;
   flagged?: boolean;
 };
@@ -137,11 +139,34 @@ async function fetchJson(url: string): Promise<string> {
   }
 }
 
-/** Fetch the upstream feed, validate it, and store the snapshot. Throws on failure. */
+/**
+ * Fetch the upstream feed with failover across sources (GitHub Pages -> the
+ * raw committed file), validate it, and store the snapshot. Throws on failure.
+ */
 export async function fetchAndCache(): Promise<void> {
   lastAttemptMs = Date.now();
+
+  const candidates = [
+    feedState.feedUrl,
+    feedState.backupFeedUrl,
+    SITE.rawFeedUrl,
+  ].filter((u, i, arr) => u && arr.indexOf(u) === i);
+
+  let text: string | undefined;
+  let lastErr: unknown;
+  for (const url of candidates) {
+    try {
+      text = await fetchJson(url);
+      break;
+    } catch (e) {
+      lastErr = e;
+    }
+  }
+
   try {
-    const text = await fetchJson(feedState.feedUrl);
+    if (text === undefined) {
+      throw lastErr instanceof Error ? lastErr : new Error("no feed source reachable");
+    }
     const json = JSON.parse(text);
     FeedSchema.parse(json); // validate shape; throws if wildly wrong
     feedState.lastGoodPayload = text;
@@ -193,6 +218,7 @@ function normalizeEntry(
     when: raw.when ?? undefined,
     note: raw.note ?? undefined,
     photo: raw.photo ?? undefined,
+    reportedAt: parseReportTime(raw.id ?? undefined)?.toISOString() ?? undefined,
     status,
   };
 }

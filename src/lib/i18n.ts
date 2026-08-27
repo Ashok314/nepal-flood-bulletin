@@ -45,6 +45,13 @@ const en = {
   fieldNote: "Note",
   flagged: "Needs review",
 
+  liveUpdatesTitle: "Live updates from the source",
+  liveUpdatesIntro:
+    "Recent changes committed by the bulletin maintainer — new reports, corrections, and rescues.",
+  liveUpdatesEmpty: "No recent updates available right now.",
+  viewAllCommits: "View all changes",
+  reportedLabel: "Reported",
+
   updatesTitle: "Official updates & posts",
   updatesIntro:
     "Human-verified links to posts from official handles and agencies.",
@@ -167,6 +174,13 @@ const ne: typeof en = {
   fieldWhen: "अन्तिम पटक देखिएको",
   fieldNote: "टिप्पणी",
   flagged: "पुनरावलोकन आवश्यक",
+
+  liveUpdatesTitle: "स्रोतबाट प्रत्यक्ष अपडेट",
+  liveUpdatesIntro:
+    "बुलेटिन सम्पादकद्वारा भर्खरै गरिएका परिवर्तन — नयाँ रिपोर्ट, सुधार, र उद्धार।",
+  liveUpdatesEmpty: "हाल कुनै अपडेट उपलब्ध छैन।",
+  viewAllCommits: "सबै परिवर्तन हेर्नुहोस्",
+  reportedLabel: "रिपोर्ट",
 
   updatesTitle: "आधिकारिक अपडेट तथा पोस्ट",
   updatesIntro:

@@ -16,9 +16,14 @@ export const SITE = {
   name: "Nepal Flood — Rescue & Relief Bulletin",
   // The event this page covers. Update if repurposed for another event.
   event: "Rasuwa / Bhotekoshi Flood",
-  // Primary upstream data source (Google Sheets -> published JSON).
+  // Source repo (the people data is a hand-maintained file committed here).
+  repo: "nirajbhusal/rasuwa-flood-bulletin",
+  // Primary upstream data source (GitHub Pages).
   defaultFeedUrl:
     "https://nirajbhusal.github.io/rasuwa-flood-bulletin/family.json",
+  // Failover: the exact committed file (updates the instant a commit lands).
+  rawFeedUrl:
+    "https://raw.githubusercontent.com/nirajbhusal/rasuwa-flood-bulletin/main/family.json",
   // Live DHM river-gauge feed powering River Watch (early warning).
   defaultRiverUrl:
     "https://nirajbhusal.github.io/rasuwa-flood-bulletin/dhm-rivers.json",

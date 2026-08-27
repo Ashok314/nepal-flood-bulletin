@@ -1,13 +1,13 @@
 # Nepal Flood — Rescue & Relief Bulletin
 
-A dockerized landing page for the Nepal (Rasuwa) flood: **search & rescue**
-(missing / rescued people), **need-attention** listings, **emergency relief**
-info, **official updates**, and **informational** PM Relief Fund details — with
-a small **admin** panel.
+A people-focused landing page for the Nepal (Rasuwa) flood: **search & rescue**
+(missing / rescued people), **need-attention** listings, live **updates from the
+source repo**, **emergency relief** info, and **informational** PM Relief Fund
+details — with a small optional **admin** panel.
 
-Data is mirrored from a public community JSON feed
-(Google Sheets → published JSON). The app **never invents or edits** entries;
-it caches the last good snapshot and applies an admin moderation overlay on top.
+Data is mirrored live from the community bulletin's public JSON feed. The app
+**never invents or edits** entries; it caches the last good snapshot and applies
+an admin moderation overlay on top.
 
 ## 🙏 Credits
 
@@ -30,23 +30,10 @@ maps use OpenStreetMap.
 - **Bilingual** UI (English / नेपाली).
 - **Admin panel** (`/admin`) — manage curated posts, feed source + refresh,
   and hide/flag feed entries.
-- **Resilient** — serves the last cached snapshot if the upstream source is down.
-
-## Run with Docker (recommended)
-
-```bash
-docker compose up --build
-```
-
-Then open:
-
-- Site: <http://localhost:3000>
-- Admin: <http://localhost:3000/admin> (default `admin` / `changeme`)
-
-> **Change `ADMIN_PASSWORD` and `SESSION_SECRET` in `docker-compose.yml`
-> before any real deployment.**
-
-Data (SQLite DB + cached feed) persists in the `angel-data` Docker volume.
+- **Resilient** — dual-source failover (GitHub Pages + `raw.githubusercontent`)
+  and serves the last cached snapshot if the upstream source is down.
+- **Live updates** — a feed of the source repo's recent commits so you can see
+  what just changed (new reports, corrections) in near real time.
 
 ## Deploy to Vercel (free tier)
 
@@ -64,12 +51,12 @@ writable disk. Just import the repo into Vercel and deploy; the default build
   Vercel's env, and switch the Prisma `datasource` provider accordingly. Without
   it, admin routes return `503` and the public site is unaffected.
 
-## Local development (without Docker)
+## Local development
 
 ```bash
 cp .env.example .env
 npm install
-npx prisma db push
+npx prisma db push   # optional — only needed for the admin panel
 npm run dev
 ```
 
@@ -86,7 +73,7 @@ npm run dev
 
 | Variable          | Purpose                                             |
 | ----------------- | --------------------------------------------------- |
-| `DATABASE_URL`    | SQLite path (Docker: `file:/data/app.db`)           |
+| `DATABASE_URL`    | Optional — enables the admin panel (local SQLite or hosted DB) |
 | `ADMIN_USER`      | Admin username                                      |
 | `ADMIN_PASSWORD`  | Admin password                                      |
 | `SESSION_SECRET`  | Secret for signing the admin session cookie         |
@@ -94,4 +81,4 @@ npm run dev
 
 ## Tech
 
-Next.js 14 (App Router) · TypeScript · Tailwind · Prisma + SQLite · jose (auth).
+Next.js 14 (App Router) · TypeScript · Tailwind · Leaflet · Prisma (optional) · jose (auth).
