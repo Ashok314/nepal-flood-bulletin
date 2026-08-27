@@ -6,7 +6,7 @@ const RISK_STYLE: Record<RiverRisk, { bar: string; badge: string; label: (m: Mes
   danger: { bar: "bg-red-500", badge: "bg-red-100 text-red-800", label: (m) => m.riverDanger },
   warning: { bar: "bg-amber-500", badge: "bg-amber-100 text-amber-800", label: (m) => m.riverWarn },
   normal: { bar: "bg-emerald-500", badge: "bg-emerald-100 text-emerald-800", label: (m) => m.riverNormal },
-  unknown: { bar: "bg-slate-400", badge: "bg-slate-100 text-slate-600", label: () => "—" },
+  unknown: { bar: "bg-slate-400", badge: "bg-slate-100 text-slate-600", label: () => "-" },
 };
 
 function Trend({ trend, m }: { trend: Station["trend"]; m: Messages }) {
@@ -47,7 +47,7 @@ function StationCard({ s, m, lang }: { s: Station; m: Messages; lang: Lang }) {
       <div className="mt-3 flex items-end justify-between">
         <div>
           <span className="text-2xl font-extrabold text-slate-900">
-            {s.levelM != null ? s.levelM.toFixed(2) : "—"}
+            {s.levelM != null ? s.levelM.toFixed(2) : "-"}
           </span>
           <span className="ml-1 text-sm text-slate-500">m</span>
         </div>
@@ -72,10 +72,10 @@ function StationCard({ s, m, lang }: { s: Station; m: Messages; lang: Lang }) {
       </div>
       <div className="mt-1 flex justify-between text-[11px] text-slate-400">
         <span>
-          {m.riverWarn}: {s.warningM != null ? `${s.warningM} m` : "—"}
+          {m.riverWarn}: {s.warningM != null ? `${s.warningM} m` : "-"}
         </span>
         <span>
-          {m.riverDanger}: {s.dangerM != null ? `${s.dangerM} m` : "—"}
+          {m.riverDanger}: {s.dangerM != null ? `${s.dangerM} m` : "-"}
         </span>
       </div>
 
@@ -142,6 +142,11 @@ export default function RiverWatch({
           ))}
         </div>
       )}
+
+      <div className="mt-6 rounded-lg border border-rose-300 bg-rose-50 px-4 py-3 text-sm">
+        <span className="font-bold text-rose-700">{m.riverSafetyTitle}</span>{" "}
+        <span className="text-slate-700">{m.riverSafetyBody}</span>
+      </div>
     </section>
   );
 }

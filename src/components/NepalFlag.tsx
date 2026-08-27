@@ -1,5 +1,5 @@
 /**
- * Flag of Nepal — the double-pennant national flag (crimson field, blue
+ * Flag of Nepal - the double-pennant national flag (crimson field, blue
  * border, white crescent moon above and white sun below). Rendered as inline
  * SVG so it scales crisply at any size.
  */

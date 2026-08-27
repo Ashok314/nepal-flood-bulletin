@@ -2,7 +2,7 @@ import type { Lang } from "@/lib/i18n";
 
 /** Format an ISO timestamp in Nepal time, tolerant of bad input. */
 export function formatDateTime(iso: string | null, lang: Lang): string {
-  if (!iso) return "—";
+  if (!iso) return "-";
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return iso;
   try {

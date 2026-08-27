@@ -12,6 +12,23 @@ html {
 
 body {
   @apply bg-slate-50 text-slate-900 antialiased;
+  /* long place names / phones / urls wrap instead of overflowing on mobile */
+  overflow-wrap: break-word;
+  text-rendering: optimizeLegibility;
+}
+
+/* Tighter, richer headings */
+h1,
+h2,
+h3 {
+  letter-spacing: -0.02em;
+}
+
+/* Never let a stray wide element cause horizontal scroll on phones */
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 /* Anchor offset so sticky header doesn't cover section headings */

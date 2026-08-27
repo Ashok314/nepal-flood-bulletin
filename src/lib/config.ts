@@ -5,15 +5,15 @@
  * *feed config/moderation* only. The content below (hotlines, donation
  * info, resources) lives here so your dev team controls it in review.
  *
- * IMPORTANT — DATA INTEGRITY:
+ * IMPORTANT - DATA INTEGRITY:
  *   Anything marked `VERIFY:` must be confirmed against an official source
  *   before this page goes live. Do NOT publish unverified donation account
- *   numbers or emergency contacts — wrong details actively harm people in a
+ *   numbers or emergency contacts - wrong details actively harm people in a
  *   disaster. The UI shows a warning banner while `donation.verified` is false.
  */
 
 export const SITE = {
-  name: "Nepal Flood — Rescue & Relief Bulletin",
+  name: "Nepal Flood - Rescue & Relief Bulletin",
   // The event this page covers. Update if repurposed for another event.
   event: "Rasuwa / Bhotekoshi Flood",
   // Source repo (the people data is a hand-maintained file committed here).
@@ -79,7 +79,7 @@ export const RESOURCES: ResourceLink[] = [
 ];
 
 /**
- * PM Relief Fund — INFORMATIONAL ONLY (no payment processing).
+ * PM Relief Fund - INFORMATIONAL ONLY (no payment processing).
  * These fields are intentionally blank. Fill them with officially verified
  * details, then set `verified: true`. While `verified` is false the public
  * page shows a "details pending verification" warning instead of the numbers.

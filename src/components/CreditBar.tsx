@@ -21,7 +21,7 @@ export default function CreditBar({ m }: { m: Messages }) {
           >
             {a.author}
           </a>{" "}
-          —{" "}
+          ·{" "}
           <a
             href={a.url}
             target="_blank"

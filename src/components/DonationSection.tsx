@@ -1,5 +1,6 @@
 import type { Lang, Messages } from "@/lib/i18n";
 import { DONATION } from "@/lib/config";
+import DonateButton from "./DonateButton";
 
 export default function DonationSection({
   lang,
@@ -24,17 +25,8 @@ export default function DonationSection({
       <div className="mt-5 rounded-xl border border-slate-200 bg-white p-6">
         <h3 className="text-lg font-semibold text-slate-900">{fundName}</h3>
 
-        {/* Primary CTA -> official government portal */}
-        {d.portalUrl && (
-          <a
-            href={d.portalUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-4 inline-flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700"
-          >
-            {m.donatePortal} ↗
-          </a>
-        )}
+        {/* Primary CTA -> official government portal (click-tracked) */}
+        {d.portalUrl && <DonateButton href={d.portalUrl} label={m.donatePortal} />}
 
         {/* Optional verified bank details (secondary) */}
         {detailsReady && (

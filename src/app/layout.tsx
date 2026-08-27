@@ -3,9 +3,9 @@ import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Nepal Flood — Rescue & Relief Bulletin",
+  title: "Nepal Flood Rescue & Relief Bulletin",
   description:
-    "Community bulletin for the Nepal (Rasuwa) flood: missing & found persons, rescue updates, how to get help, and official relief information. Data mirrored from a public community bulletin.",
+    "Missing and found persons, live rescue updates, and relief information for the Nepal (Rasuwa) flood.",
   robots: { index: true, follow: true },
 };
 
@@ -30,7 +30,7 @@ export default function RootLayout({
           crossOrigin="anonymous"
         />
         <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap"
           rel="stylesheet"
         />
       </head>

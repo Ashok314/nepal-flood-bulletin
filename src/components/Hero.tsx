@@ -6,9 +6,8 @@ import { formatDateTime } from "@/lib/format";
 import { telHref } from "@/lib/format";
 
 const NAV = [
-  { href: "#rivers", key: "riverTitle" as const },
-  { href: "#map", key: "mapTitle" as const },
   { href: "#search-rescue", key: "srTitle" as const },
+  { href: "#rivers", key: "riverTitle" as const },
   { href: "#updates", key: "updatesTitle" as const },
   { href: "#help", key: "emergencyRelief" as const },
   { href: "#donate", key: "donationTitle" as const },
@@ -57,19 +56,23 @@ export default function Hero({
 
       {/* Banner */}
       <div className="bg-gradient-to-b from-brand to-brand-dark text-white">
-        <div className="mx-auto max-w-6xl px-4 py-8 sm:py-10">
-          <span className="inline-block rounded-full bg-white/15 px-3 py-1 text-xs font-semibold">
+        <div className="mx-auto max-w-6xl px-4 py-4 sm:py-10">
+          <span className="hidden rounded-full bg-white/15 px-3 py-1 text-xs font-semibold sm:inline-block">
             {SITE.event}
           </span>
-          <div className="mt-3 flex items-center gap-3">
-            <NepalFlag className="h-11 w-auto shrink-0 drop-shadow-md" />
-            <h1 className="text-3xl font-bold sm:text-4xl">
-              {lang === "ne" ? "नेपाल बाढी" : "Nepal Flood"} —{" "}
-              <span className="font-medium">{m.siteTagline}</span>
-            </h1>
+          <div className="flex items-center gap-3 sm:mt-3">
+            <NepalFlag className="h-9 w-auto shrink-0 drop-shadow-md sm:h-12" />
+            <div className="min-w-0">
+              <h1 className="text-xl font-extrabold leading-tight tracking-tight sm:text-4xl">
+                {lang === "ne" ? "नेपाल बाढी" : "Nepal Flood"}
+              </h1>
+              <p className="text-xs font-medium text-white/80 sm:text-base">
+                {m.siteTagline}
+              </p>
+            </div>
           </div>
 
-          <p className="mt-2 text-sm text-white/80">
+          <p className="mt-2 hidden text-sm text-white/80 sm:block">
             {m.updatedAt}: {formatDateTime(meta.updatedAt, lang)}
             {meta.sheetUrl && (
               <>
@@ -92,11 +95,11 @@ export default function Hero({
             </p>
           )}
 
-          {/* Status summary chips */}
-          <div className="mt-4 flex flex-wrap gap-2">
+          {/* Status chips - hidden on mobile; counts + search live in the cards below */}
+          <div className="mt-4 hidden flex-wrap gap-2 sm:flex">
             <a
               href="#search-rescue"
-              className="flex items-center gap-2 rounded-lg bg-white/10 px-3 py-1.5 text-sm ring-1 ring-white/20 hover:bg-white/20"
+              className="hidden items-center gap-2 rounded-lg bg-white/10 px-3 py-1.5 text-sm ring-1 ring-white/20 hover:bg-white/20 sm:flex"
             >
               <span className="inline-block h-2 w-2 rounded-full bg-rose-300" />
               {m.needAttentionChip}
@@ -104,7 +107,7 @@ export default function Hero({
             </a>
             <a
               href="#search-rescue"
-              className="flex items-center gap-2 rounded-lg bg-white/10 px-3 py-1.5 text-sm ring-1 ring-white/20 hover:bg-white/20"
+              className="hidden items-center gap-2 rounded-lg bg-white/10 px-3 py-1.5 text-sm ring-1 ring-white/20 hover:bg-white/20 sm:flex"
             >
               <span className="inline-block h-2 w-2 rounded-full bg-emerald-300" />
               {m.rescuedChip}
@@ -112,14 +115,14 @@ export default function Hero({
             </a>
             <a
               href="#search-rescue"
-              className="flex items-center gap-2 rounded-lg bg-white/10 px-3 py-1.5 text-sm ring-1 ring-white/20 hover:bg-white/20"
+              className="flex items-center gap-2 rounded-lg bg-white/15 px-3.5 py-2 text-sm font-semibold ring-1 ring-white/25 hover:bg-white/25"
             >
               🔎 {m.searchByName}
             </a>
           </div>
 
-          {/* Emergency hotlines */}
-          <div className="mt-5">
+          {/* Emergency hotlines - full list on larger screens */}
+          <div className="mt-5 hidden sm:block">
             <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-white/70">
               {m.emergency}
             </p>
@@ -135,6 +138,26 @@ export default function Hero({
                 </a>
               ))}
             </div>
+          </div>
+
+          {/* Emergency hotlines - compact on mobile (full list lives in Help) */}
+          <div className="mt-4 flex flex-wrap items-center gap-2 sm:hidden">
+            {HOTLINES.slice(0, 2).map((h) => (
+              <a
+                key={h.number}
+                href={telHref(h.number)}
+                className="rounded-lg bg-white/10 px-3 py-1.5 text-sm font-medium ring-1 ring-white/20"
+              >
+                {lang === "ne" ? h.label_ne : h.label_en}:{" "}
+                <span className="font-bold">{h.number}</span>
+              </a>
+            ))}
+            <a
+              href="#help"
+              className="rounded-lg px-2 py-1.5 text-sm font-semibold text-white/85 underline decoration-white/40"
+            >
+              {m.emergency} →
+            </a>
           </div>
         </div>
       </div>

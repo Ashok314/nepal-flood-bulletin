@@ -14,13 +14,13 @@ const en = {
   updatedAt: "Data updated",
   source: "Source",
   sourceUnreachable:
-    "Live source is currently unreachable — showing the last saved data.",
+    "Live source unavailable. Showing the last saved data.",
   emergency: "Emergency hotlines",
   call: "Call",
 
   srTitle: "Search & Rescue",
   srIntro:
-    "People reported missing or found in the flood. Reported by the community — verify directly before acting.",
+    "Reported by the community. Verify directly before acting.",
   tabMissing: "Need attention",
   tabFound: "Rescued & safe",
   statusMissing: "Missing",
@@ -45,11 +45,9 @@ const en = {
   fieldNote: "Note",
   flagged: "Needs review",
 
-  liveUpdatesTitle: "Live updates from the source",
-  liveUpdatesIntro:
-    "Recent changes committed by the bulletin maintainer — new reports, corrections, and rescues.",
-  liveUpdatesEmpty: "No recent updates available right now.",
-  viewAllCommits: "View all changes",
+  liveUpdatesTitle: "Live updates",
+  liveUpdatesIntro: "Recent changes from the bulletin source.",
+  liveUpdatesEmpty: "No recent updates.",
   reportedLabel: "Reported",
 
   updatesTitle: "Official updates & posts",
@@ -74,7 +72,7 @@ const en = {
   donationAccountName: "Account name",
   donationAccountNumber: "Account number",
   officialPage: "Official page",
-  donatePortal: "Donate via official PM Disaster Relief Fund portal",
+  donatePortal: "Donate at the official portal",
   donateInfoNote:
     "Payment is processed on the official government portal (pmdrf.nchl.com.np). This site does not handle payments and is not affiliated with any government body.",
 
@@ -90,7 +88,7 @@ const en = {
   kpiMinors: "minors",
   kpiElderly: "elderly",
   kpiForeign: "foreign*",
-  kpiForeignNote: "*foreign nationals — approximate (from location / phone)",
+  kpiForeignNote: "*foreign nationals, approximate (from location / phone)",
   minAgo: "min ago",
   tagMinor: "Minor",
   tagElderly: "Elderly",
@@ -123,7 +121,7 @@ const en = {
   mapDisclaimer:
     "Pins and paths are approximate (market / bridge points, not the exact channel). Verify with DHM and local authorities.",
   mapRain: "Rain radar",
-  mapRainNote: "Live rain radar by RainViewer — toggle it top-right on the map.",
+  mapRainNote: "Live rain radar by RainViewer. Toggle it top-right.",
   riverSafetyTitle: "Request to people living near the river.",
   riverSafetyBody: "Move from the riverside to higher ground and stay on high alert.",
 
@@ -144,13 +142,13 @@ const ne: typeof en = {
   updatedAt: "तथ्याङ्क अद्यावधिक",
   source: "स्रोत",
   sourceUnreachable:
-    "प्रत्यक्ष स्रोत हाल उपलब्ध छैन — पछिल्लो सुरक्षित तथ्याङ्क देखाइँदैछ।",
+    "प्रत्यक्ष स्रोत उपलब्ध छैन। पछिल्लो सुरक्षित तथ्याङ्क देखाइँदैछ।",
   emergency: "आपत्‌कालीन नम्बरहरू",
   call: "फोन",
 
   srTitle: "खोज तथा उद्धार",
   srIntro:
-    "बाढीमा हराएका वा भेटिएका व्यक्तिहरू। समुदायद्वारा रिपोर्ट गरिएको — कार्य गर्नुअघि प्रत्यक्ष पुष्टि गर्नुहोस्।",
+    "समुदायद्वारा रिपोर्ट गरिएको। कार्य गर्नुअघि प्रत्यक्ष पुष्टि गर्नुहोस्।",
   tabMissing: "ध्यान आवश्यक",
   tabFound: "उद्धार / सुरक्षित",
   statusMissing: "हराएको",
@@ -175,11 +173,9 @@ const ne: typeof en = {
   fieldNote: "टिप्पणी",
   flagged: "पुनरावलोकन आवश्यक",
 
-  liveUpdatesTitle: "स्रोतबाट प्रत्यक्ष अपडेट",
-  liveUpdatesIntro:
-    "बुलेटिन सम्पादकद्वारा भर्खरै गरिएका परिवर्तन — नयाँ रिपोर्ट, सुधार, र उद्धार।",
-  liveUpdatesEmpty: "हाल कुनै अपडेट उपलब्ध छैन।",
-  viewAllCommits: "सबै परिवर्तन हेर्नुहोस्",
+  liveUpdatesTitle: "प्रत्यक्ष अपडेट",
+  liveUpdatesIntro: "बुलेटिन स्रोतबाट भर्खरका परिवर्तन।",
+  liveUpdatesEmpty: "हाल कुनै अपडेट छैन।",
   reportedLabel: "रिपोर्ट",
 
   updatesTitle: "आधिकारिक अपडेट तथा पोस्ट",
@@ -204,8 +200,7 @@ const ne: typeof en = {
   donationAccountName: "खाता नाम",
   donationAccountNumber: "खाता नम्बर",
   officialPage: "आधिकारिक पृष्ठ",
-  donatePortal:
-    "आधिकारिक प्रधानमन्त्री दैवी प्रकोप उद्धार कोष पोर्टलबाट सहयोग गर्नुहोस्",
+  donatePortal: "आधिकारिक पोर्टलमा सहयोग गर्नुहोस्",
   donateInfoNote:
     "भुक्तानी आधिकारिक सरकारी पोर्टल (pmdrf.nchl.com.np) मा हुन्छ। यो साइटले भुक्तानी लिँदैन र कुनै सरकारी निकायसँग सम्बद्ध छैन।",
 
@@ -221,7 +216,7 @@ const ne: typeof en = {
   kpiMinors: "नाबालक",
   kpiElderly: "वृद्ध",
   kpiForeign: "विदेशी*",
-  kpiForeignNote: "*विदेशी नागरिक — स्थान/फोनका आधारमा अनुमानित",
+  kpiForeignNote: "*विदेशी नागरिक, स्थान/फोनका आधारमा अनुमानित",
   minAgo: "मिनेट अघि",
   tagMinor: "नाबालक",
   tagElderly: "वृद्ध",
@@ -254,7 +249,7 @@ const ne: typeof en = {
   mapDisclaimer:
     "पिन र मार्ग अनुमानित हुन् (बजार/पुल बिन्दु, ठ्याक्कै नदी बहाव होइन)। DHM र स्थानीय अधिकारीसँग पुष्टि गर्नुहोस्।",
   mapRain: "वर्षा राडार",
-  mapRainNote: "RainViewer द्वारा प्रत्यक्ष वर्षा राडार — नक्साको दायाँ-माथिबाट टगल गर्नुहोस्।",
+  mapRainNote: "RainViewer द्वारा प्रत्यक्ष वर्षा राडार। दायाँ-माथिबाट टगल गर्नुहोस्।",
   riverSafetyTitle: "नदी किनारमा बस्ने जनतालाई अनुरोध।",
   riverSafetyBody: "नदी किनारबाट अग्लो सुरक्षित स्थानमा जानुहोस् र उच्च सतर्क रहनुहोस्।",
 

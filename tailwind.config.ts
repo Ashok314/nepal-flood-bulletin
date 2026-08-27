@@ -6,7 +6,7 @@ const config: Config = {
     extend: {
       fontFamily: {
         sans: [
-          "Inter",
+          "Plus Jakarta Sans",
           "Noto Sans Devanagari",
           "system-ui",
           "-apple-system",

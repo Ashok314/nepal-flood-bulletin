@@ -41,7 +41,7 @@ export default function LoginPage() {
       >
         <h1 className="text-xl font-bold text-slate-900">Admin sign in</h1>
         <p className="mt-1 text-sm text-slate-500">
-          Nepal Flood Bulletin — content management
+          Nepal Flood Bulletin - content management
         </p>
 
         <label className="mt-5 block text-sm font-medium text-slate-700">

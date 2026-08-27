@@ -7,9 +7,8 @@ import { getMessages, isLang, type Lang } from "@/lib/i18n";
 import CreditBar from "@/components/CreditBar";
 import Hero from "@/components/Hero";
 import KpiHeader from "@/components/KpiHeader";
-import RecentUpdates from "@/components/RecentUpdates";
+import LiveUpdatesPanel from "@/components/LiveUpdatesPanel";
 import RiverWatch from "@/components/RiverWatch";
-import FloodMap from "@/components/FloodMap";
 import SearchRescue from "@/components/SearchRescue";
 import OfficialUpdates, {
   type PublicPost,
@@ -75,52 +74,9 @@ export default async function Page({
 
       <KpiHeader lang={lang} m={m} kpis={kpis} />
 
+      <LiveUpdatesPanel m={m} lang={lang} items={updates} />
+
       <main>
-        <RecentUpdates lang={lang} m={m} items={updates} />
-
-        <RiverWatch lang={lang} m={m} rivers={rivers} />
-
-        <section id="map" className="mx-auto max-w-6xl px-4 pb-10">
-          <h2 className="text-2xl font-bold text-slate-900">{m.mapTitle}</h2>
-          <p className="mt-1 max-w-3xl text-sm text-slate-500">{m.mapIntro}</p>
-
-          <div className="mt-4">
-            <FloodMap stations={rivers.stations} m={m} lang={lang} />
-          </div>
-
-          {/* Legend */}
-          <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-slate-600">
-            <span className="flex items-center gap-1.5">
-              <span className="inline-block h-1 w-6 rounded bg-brand" />
-              {m.mapConfirmed}
-            </span>
-            <span className="flex items-center gap-1.5">
-              <span className="inline-block w-6 border-t-2 border-dashed border-amber-500" />
-              {m.mapAtRisk}
-            </span>
-            <span className="flex items-center gap-1.5">
-              <span className="inline-flex gap-0.5">
-                <span className="h-3 w-3 rounded-full bg-red-600 ring-2 ring-white" />
-                <span className="h-3 w-3 rounded-full bg-amber-500 ring-2 ring-white" />
-                <span className="h-3 w-3 rounded-full bg-emerald-600 ring-2 ring-white" />
-              </span>
-              {m.mapGauge}
-            </span>
-            <span className="flex items-center gap-1.5">
-              <span className="h-3 w-3 rounded-full bg-amber-700 ring-2 ring-white" />
-              {m.mapEntry}
-            </span>
-          </div>
-          <p className="mt-2 text-[11px] text-slate-400">{m.mapDisclaimer}</p>
-          <p className="mt-1 text-[11px] text-slate-400">🌧 {m.mapRainNote}</p>
-
-          {/* Safety call to action */}
-          <div className="mt-4 rounded-lg border border-rose-300 bg-rose-50 px-4 py-3 text-sm">
-            <span className="font-bold text-rose-700">{m.riverSafetyTitle}</span>{" "}
-            <span className="text-slate-700">{m.riverSafetyBody}</span>
-          </div>
-        </section>
-
         <section
           id="search-rescue"
           className="mx-auto max-w-6xl px-4 py-10"
@@ -137,6 +93,8 @@ export default async function Page({
             />
           </div>
         </section>
+
+        <RiverWatch lang={lang} m={m} rivers={rivers} />
 
         <div className="bg-slate-100">
           <OfficialUpdates m={m} posts={posts} />

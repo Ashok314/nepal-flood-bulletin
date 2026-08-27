@@ -50,7 +50,7 @@ export default function HelpSection({
                 </a>
               )}
               {!forms.missing && !forms.found && (
-                <p className="text-sm text-slate-400">—</p>
+                <p className="text-sm text-slate-400">-</p>
               )}
             </div>
           </div>

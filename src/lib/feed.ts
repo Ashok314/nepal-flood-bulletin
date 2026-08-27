@@ -183,7 +183,7 @@ export async function fetchAndCache(): Promise<void> {
 
 function maybeBackgroundRefresh() {
   if (Date.now() - lastAttemptMs < MIN_ATTEMPT_GAP_MS) return;
-  // Fire and forget — the running server process lives long enough to finish it,
+  // Fire and forget - the running server process lives long enough to finish it,
   // and the fresh snapshot is picked up on the next request.
   void fetchAndCache().catch(() => {
     /* already recorded on FeedConfig */
@@ -210,7 +210,7 @@ function normalizeEntry(
 ): Person {
   return {
     id: raw.id ?? `${status}-${index}-${(raw.name || "unknown").slice(0, 24)}`,
-    name: raw.name || "—",
+    name: raw.name || "-",
     nameEn: raw.name_en ?? undefined,
     place: raw.place ?? undefined,
     phone: raw.phone ?? undefined,

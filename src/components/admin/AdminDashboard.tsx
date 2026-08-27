@@ -503,7 +503,7 @@ function FeedPanel({
         </h2>
         <p className="mt-1 text-xs text-slate-500">
           Hidden entries are removed from the public page. The upstream source
-          is never changed — clearing a flag restores the entry.
+          is never changed - clearing a flag restores the entry.
         </p>
 
         <input

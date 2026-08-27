@@ -138,8 +138,8 @@ function normalize(station: z.infer<typeof StationSchema>): Station {
 
   return {
     id: station.station_id || station.name || Math.random().toString(36).slice(2),
-    name: station.name || station.name_np || "—",
-    nameNp: station.name_np || station.name || "—",
+    name: station.name || station.name_np || "-",
+    nameNp: station.name_np || station.name || "-",
     districtNp: station.district_np || "",
     warningM,
     dangerM,
