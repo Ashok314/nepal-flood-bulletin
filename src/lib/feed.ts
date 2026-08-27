@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { getPrisma } from "@/lib/db";
 import { SITE } from "@/lib/config";
 import { parseReportTime } from "@/lib/derive";
 
@@ -190,19 +189,6 @@ function maybeBackgroundRefresh() {
   });
 }
 
-// ---------- Moderation overlay ----------
-
-async function getModerationMap(): Promise<Map<string, string>> {
-  const prisma = getPrisma();
-  if (!prisma) return new Map();
-  try {
-    const flags = await prisma.moderationFlag.findMany();
-    return new Map(flags.map((f) => [f.entryId, f.action]));
-  } catch {
-    return new Map();
-  }
-}
-
 function normalizeEntry(
   raw: RawEntry,
   index: number,
@@ -221,16 +207,6 @@ function normalizeEntry(
     reportedAt: parseReportTime(raw.id ?? undefined)?.toISOString() ?? undefined,
     status,
   };
-}
-
-function applyModeration(people: Person[], mod: Map<string, string>): Person[] {
-  const out: Person[] = [];
-  for (const p of people) {
-    const action = mod.get(p.id);
-    if (action === "hide") continue;
-    out.push(action === "flag" ? { ...p, flagged: true } : p);
-  }
-  return out;
 }
 
 // ---------- Public read API ----------
@@ -256,7 +232,6 @@ export async function getFeed(): Promise<NormalizedFeed> {
     maybeBackgroundRefresh();
   }
 
-  const mod = await getModerationMap();
   const empty: NormalizedFeed = {
     updatedAt: null,
     fetchedAt: cfg.lastFetchedAt ? cfg.lastFetchedAt.toISOString() : null,
@@ -285,14 +260,8 @@ export async function getFeed(): Promise<NormalizedFeed> {
     }
   }
 
-  const missing = applyModeration(
-    feed.missing.map((e, i) => normalizeEntry(e, i, "missing")),
-    mod,
-  );
-  const found = applyModeration(
-    feed.found.map((e, i) => normalizeEntry(e, i, "found")),
-    mod,
-  );
+  const missing = feed.missing.map((e, i) => normalizeEntry(e, i, "missing"));
+  const found = feed.found.map((e, i) => normalizeEntry(e, i, "found"));
 
   return {
     updatedAt: feed.updated_at ?? null,
@@ -310,23 +279,4 @@ export async function getFeed(): Promise<NormalizedFeed> {
     sourceUrl: cfg.feedUrl,
     stale: cfg.lastStatus === "error" && hasSnapshot,
   };
-}
-
-/**
- * All entries from the cached snapshot WITHOUT the moderation overlay applied.
- * Used by the admin panel so hidden entries can still be seen and un-hidden.
- */
-export async function getAllEntriesRaw(): Promise<Person[]> {
-  const cfg = await getFeedConfig();
-  if (cfg.lastGoodPayload === "") return [];
-  let feed: z.infer<typeof FeedSchema>;
-  try {
-    feed = FeedSchema.parse(JSON.parse(cfg.lastGoodPayload));
-  } catch {
-    return [];
-  }
-  return [
-    ...feed.missing.map((e, i) => normalizeEntry(e, i, "missing")),
-    ...feed.found.map((e, i) => normalizeEntry(e, i, "found")),
-  ];
 }

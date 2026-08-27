@@ -1,4 +1,3 @@
-import Link from "next/link";
 import type { Lang, Messages } from "@/lib/i18n";
 import { SITE } from "@/lib/config";
 import { formatDateTime } from "@/lib/format";
@@ -44,13 +43,10 @@ export default function Footer({
           )}
         </p>
 
-        <div className="mt-4 flex items-center gap-4">
+        <div className="mt-4">
           <a href="#top" className="hover:text-brand">
             ↑ {m.backToTop}
           </a>
-          <Link href="/admin" className="text-slate-400 hover:text-brand">
-            Admin
-          </Link>
         </div>
       </div>
     </footer>

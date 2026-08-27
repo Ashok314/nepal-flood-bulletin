@@ -1,4 +1,3 @@
-import { getPrisma } from "@/lib/db";
 import { getFeed } from "@/lib/feed";
 import { getRivers } from "@/lib/rivers";
 import { getRecentUpdates } from "@/lib/updates";
@@ -10,9 +9,6 @@ import KpiHeader from "@/components/KpiHeader";
 import LiveUpdatesPanel from "@/components/LiveUpdatesPanel";
 import RiverWatch from "@/components/RiverWatch";
 import SearchRescue from "@/components/SearchRescue";
-import OfficialUpdates, {
-  type PublicPost,
-} from "@/components/OfficialUpdates";
 import HelpSection from "@/components/HelpSection";
 import DonationSection from "@/components/DonationSection";
 import Footer from "@/components/Footer";
@@ -27,36 +23,13 @@ export default async function Page({
   const lang: Lang = isLang(searchParams.lang) ? searchParams.lang : "en";
   const m = getMessages(lang);
 
-  const prisma = getPrisma();
-  const [feed, rivers, updates, rawPosts] = await Promise.all([
+  const [feed, rivers, updates] = await Promise.all([
     getFeed(),
     getRivers(),
     getRecentUpdates(),
-    prisma
-      ? prisma.curatedPost
-          .findMany({
-            where: { published: true },
-            orderBy: [
-              { pinned: "desc" },
-              { order: "asc" },
-              { createdAt: "desc" },
-            ],
-          })
-          .catch(() => [])
-      : Promise.resolve([]),
   ]);
 
   const kpis = deriveKpis(feed, rivers);
-
-  const posts: PublicPost[] = rawPosts.map((p) => ({
-    id: p.id,
-    type: p.type,
-    url: p.url,
-    title: p.title,
-    source: p.source,
-    verified: p.verified,
-    pinned: p.pinned,
-  }));
 
   return (
     <div id="top">
@@ -95,10 +68,6 @@ export default async function Page({
         </section>
 
         <RiverWatch lang={lang} m={m} rivers={rivers} />
-
-        <div className="bg-slate-100">
-          <OfficialUpdates m={m} posts={posts} />
-        </div>
 
         <HelpSection lang={lang} m={m} forms={feed.forms} />
 

@@ -1,84 +1,56 @@
-# Nepal Flood — Rescue & Relief Bulletin
+# Nepal Flood Rescue & Relief Bulletin
 
-A people-focused landing page for the Nepal (Rasuwa) flood: **search & rescue**
-(missing / rescued people), **need-attention** listings, live **updates from the
-source repo**, **emergency relief** info, and **informational** PM Relief Fund
-details — with a small optional **admin** panel.
+A people-focused site for the Nepal (Rasuwa) flood. Its only job is to help
+people **search for and find the missing**, with a searchable list of missing
+and rescued people, live updates from the source, river early-warning, emergency
+contacts, and an official PM Relief Fund donate link.
 
-Data is mirrored live from the community bulletin's public JSON feed. The app
-**never invents or edits** entries; it caches the last good snapshot and applies
-an admin moderation overlay on top.
+No database, no login, no admin. The site fetches the community bulletin's live
+JSON feed at request time and caches it in memory. It **never invents or edits**
+entries.
 
 ## 🙏 Credits
 
 The underlying data and the original bulletin are the work of
-**[Niraj Bhusal](https://github.com/nirajbhusal)** —
+**[Niraj Bhusal](https://github.com/nirajbhusal)** /
 [Rasuwa Flood Bulletin](https://nirajbhusal.github.io/rasuwa-flood-bulletin/).
-This project is an enhanced front end built on top of that public data feed and
-the live **DHM** hydrology feed. **Full credit to the original author.** River
-levels are sourced from Nepal's Department of Hydrology & Meteorology (DHM);
-maps use OpenStreetMap.
+**Full credit to the original author.** We only mirror the people data to help.
+River levels come from Nepal's Department of Hydrology & Meteorology (DHM).
 
 ## Features
 
-- **Search & Rescue** — searchable "Need attention" (missing) and
-  "Rescued & safe" (found) lists from the live feed. Search by name / place / phone.
+- **Search & Rescue** (first thing you see): searchable "Need attention"
+  (missing) and "Rescued & safe" (found) lists. Search by name, place, or phone,
+  with paginated cards showing photo, age, last-seen, contacts, and "reported X ago".
 - **Report** buttons that deep-link to the official Google Forms.
-- **Official updates** — human-verified curated links/posts from official handles.
-- **Emergency relief** — hotlines, report forms, resource links.
-- **Support & Donation** — PM Relief Fund, informational only (no payments).
+- **Live updates**: a collapsible side panel of the source repo's recent commits,
+  so you can see what just changed (new reports, corrections) in near real time.
+- **River Watch**: live DHM gauges with warning/danger levels and a danger alert.
+- **Emergency relief**: hotlines and resource links.
+- **Support & Donation**: opens the official PM Disaster Relief Fund portal
+  (`pmdrf.nchl.com.np`); the click is tracked via Vercel Analytics.
 - **Bilingual** UI (English / नेपाली).
-- **Admin panel** (`/admin`) — manage curated posts, feed source + refresh,
-  and hide/flag feed entries.
-- **Resilient** — dual-source failover (GitHub Pages + `raw.githubusercontent`)
-  and serves the last cached snapshot if the upstream source is down.
-- **Live updates** — a feed of the source repo's recent commits so you can see
-  what just changed (new reports, corrections) in near real time.
+- **Resilient**: dual-source failover (GitHub Pages + `raw.githubusercontent`),
+  serving the last cached snapshot if the upstream source is briefly down.
 
-## Deploy to Vercel (free tier)
+## Deploy to Vercel
 
-The public site runs on Vercel with **no database** — the flood feed and river
-data are fetched at request time and cached in memory, so nothing needs a
-writable disk. Just import the repo into Vercel and deploy; the default build
-(`prisma generate && next build`) works as-is.
-
-- **No `DATABASE_URL` needed** for the public site. (SQLite can't be used on
-  Vercel — its filesystem is read-only.)
-- The **admin panel** (curated posts + moderation) needs a hosted database.
-  To enable it, attach a serverless DB — **[Neon](https://neon.tech)** Postgres
-  or **[Turso](https://turso.tech)** (libSQL/SQLite) both have free tiers — set
-  `DATABASE_URL` (and `ADMIN_USER`, `ADMIN_PASSWORD`, `SESSION_SECRET`) in
-  Vercel's env, and switch the Prisma `datasource` provider accordingly. Without
-  it, admin routes return `503` and the public site is unaffected.
+The site needs **no environment variables and no database**. Import the repo into
+Vercel and deploy; the default build (`next build`) just works.
 
 ## Local development
 
 ```bash
-cp .env.example .env
 npm install
-npx prisma db push   # optional — only needed for the admin panel
 npm run dev
 ```
 
-## Before going live — data integrity checklist
+## Before going live
 
-- [ ] Fill **verified** PM Relief Fund details in `src/lib/config.ts`
-      (`DONATION`) and set `verified: true`. Until then the page shows a
-      "pending verification" warning instead of account numbers.
-- [ ] Confirm the **emergency hotline numbers** in `src/lib/config.ts`.
-- [ ] Review the **feed source URL** in the admin panel.
-- [ ] This is an **unofficial** community mirror — the footer says so; keep it.
-
-## Configuration
-
-| Variable          | Purpose                                             |
-| ----------------- | --------------------------------------------------- |
-| `DATABASE_URL`    | Optional — enables the admin panel (local SQLite or hosted DB) |
-| `ADMIN_USER`      | Admin username                                      |
-| `ADMIN_PASSWORD`  | Admin password                                      |
-| `SESSION_SECRET`  | Secret for signing the admin session cookie         |
-| `COOKIE_SECURE`   | `"true"` only when served over HTTPS                |
+- [ ] Confirm the **PM Relief Fund portal URL** and **emergency hotline numbers**
+      in `src/lib/config.ts`.
+- [ ] This is an **unofficial** community mirror; the footer says so, keep it.
 
 ## Tech
 
-Next.js 14 (App Router) · TypeScript · Tailwind · Leaflet · Prisma (optional) · jose (auth).
+Next.js 14 (App Router) · TypeScript · Tailwind · Vercel Analytics.
