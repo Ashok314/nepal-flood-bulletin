@@ -7,7 +7,7 @@ import { formatDateTime } from "@/lib/format";
 const NAV = [
   { href: "#search-rescue", key: "navSearch" as const },
   { href: "#overview", key: "navOverview" as const },
-  { href: "#updates", key: "navUpdates" as const },
+  { href: "#help", key: "navEmergency" as const },
   { href: "#donate", key: "navDonate" as const },
 ];
 

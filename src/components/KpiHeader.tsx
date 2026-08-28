@@ -47,7 +47,7 @@ export default function KpiHeader({
       : "emerald";
 
   return (
-    <section id="overview" className="border-b border-slate-200 bg-slate-100">
+    <section id="overview" className="scroll-mt-16 border-b border-slate-200 bg-slate-100">
       <div className="mx-auto max-w-6xl px-4 py-6">
         <h2 className="mb-3 text-sm font-bold uppercase tracking-wide text-slate-500">
           {m.kpiTitle}

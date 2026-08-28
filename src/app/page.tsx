@@ -98,13 +98,9 @@ export default async function Page({
         forms={merged.forms}
       />
 
-      <div id="overview" className="scroll-mt-16">
-        <KpiHeader lang={lang} m={m} kpis={kpis} />
-      </div>
+      <KpiHeader lang={lang} m={m} kpis={kpis} />
 
-      <div id="updates" className="scroll-mt-16">
-        <LiveUpdatesPanel m={m} lang={lang} items={updates} />
-      </div>
+      <LiveUpdatesPanel m={m} lang={lang} items={updates} />
 
       <main>
         <section
