@@ -53,57 +53,80 @@ export default function KpiHeader({
           {m.kpiTitle}
         </h2>
 
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-7">
-          <Stat value={kpis.missing.toLocaleString()} label={m.kpiStillMissing} tone="rose" />
-          <Stat value={kpis.rescued.toLocaleString()} label={m.kpiRescued} tone="emerald" />
-          <Stat value={kpis.reunited.toLocaleString()} label={m.kpiReunited} tone="blue" />
-          <Stat value={`${kpis.accountedPct}%`} label={m.kpiAccounted} tone="slate" />
-          <Stat value={kpis.new24h.toLocaleString()} label={m.kpiNew24h} tone="amber" />
-          <Stat
-            value={kpis.rivers.aboveWarning}
-            label={m.kpiRiversWarn}
-            tone={riverTone}
-            sub={
-              kpis.rivers.aboveDanger > 0
-                ? `${kpis.rivers.aboveDanger} ${m.riverDanger.toLowerCase()}`
-                : undefined
-            }
-          />
-          <Stat value={kpis.affectedDistricts} label={m.kpiDistricts} tone="indigo" />
-        </div>
-
-        {/* Vulnerability line */}
-        <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-slate-600">
-          <span className="font-medium text-slate-500">{m.kpiOfMissing}:</span>
-          <span>
-            <b className="text-slate-800">{kpis.vulnerable.minors}</b> {m.kpiMinors}
-          </span>
-          <span>
-            <b className="text-slate-800">{kpis.vulnerable.elderly}</b> {m.kpiElderly}
-          </span>
-          <span>
-            <b className="text-slate-800">{kpis.vulnerable.foreign}</b> {m.kpiForeign}
-          </span>
-          {kpis.topDistricts.length > 0 && (
-            <span className="text-slate-400">
-              · {kpis.topDistricts.map((d) => `${d.name} (${d.count})`).join(" · ")}
-            </span>
+        {/* Only show a card when we actually have data for it — a lone "0"
+            reads as broken, not informative. */}
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+          {kpis.missing > 0 && (
+            <Stat value={kpis.missing.toLocaleString()} label={m.kpiStillMissing} tone="rose" />
+          )}
+          {kpis.rescued > 0 && (
+            <Stat value={kpis.rescued.toLocaleString()} label={m.kpiRescued} tone="emerald" />
+          )}
+          {kpis.missing + kpis.rescued > 0 && (
+            <Stat value={`${kpis.accountedPct}%`} label={m.kpiAccounted} tone="slate" />
+          )}
+          {kpis.reunited > 0 && (
+            <Stat value={kpis.reunited.toLocaleString()} label={m.kpiReunited} tone="blue" />
+          )}
+          {kpis.new24h > 0 && (
+            <Stat value={kpis.new24h.toLocaleString()} label={m.kpiNew24h} tone="amber" />
+          )}
+          {kpis.rivers.aboveWarning > 0 && (
+            <Stat
+              value={kpis.rivers.aboveWarning}
+              label={m.kpiRiversWarn}
+              tone={riverTone}
+              sub={
+                kpis.rivers.aboveDanger > 0
+                  ? `${kpis.rivers.aboveDanger} ${m.riverDanger.toLowerCase()}`
+                  : undefined
+              }
+            />
+          )}
+          {kpis.affectedDistricts > 0 && (
+            <Stat value={kpis.affectedDistricts} label={m.kpiDistricts} tone="indigo" />
           )}
         </div>
 
-        <div className="mt-2 flex flex-wrap gap-x-4 text-[11px] text-slate-400">
-          <span>{m.kpiForeignNote}</span>
-          {kpis.freshness.feedMinutes != null && (
-            <span>
-              {m.updatedAt}: {kpis.freshness.feedMinutes} {m.minAgo}
-            </span>
-          )}
-          {kpis.freshness.riverMinutes != null && (
-            <span>
-              {m.riverTitle}: {kpis.freshness.riverMinutes} {m.minAgo}
-            </span>
-          )}
-        </div>
+        {/* Vulnerability line — only the parts we actually have */}
+        {(kpis.vulnerable.minors > 0 ||
+          kpis.vulnerable.elderly > 0 ||
+          kpis.vulnerable.foreign > 0) && (
+          <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-slate-600">
+            <span className="font-medium text-slate-500">{m.kpiOfMissing}:</span>
+            {kpis.vulnerable.minors > 0 && (
+              <span>
+                <b className="text-slate-800">{kpis.vulnerable.minors}</b> {m.kpiMinors}
+              </span>
+            )}
+            {kpis.vulnerable.elderly > 0 && (
+              <span>
+                <b className="text-slate-800">{kpis.vulnerable.elderly}</b> {m.kpiElderly}
+              </span>
+            )}
+            {kpis.vulnerable.foreign > 0 && (
+              <span>
+                <b className="text-slate-800">{kpis.vulnerable.foreign}</b> {m.kpiForeign}
+              </span>
+            )}
+            {kpis.topDistricts.length > 0 && (
+              <span className="text-slate-400">
+                · {kpis.topDistricts.map((d) => `${d.name} (${d.count})`).join(" · ")}
+              </span>
+            )}
+          </div>
+        )}
+
+        {(kpis.vulnerable.foreign > 0 || kpis.freshness.feedMinutes != null) && (
+          <div className="mt-2 flex flex-wrap gap-x-4 text-[11px] text-slate-400">
+            {kpis.vulnerable.foreign > 0 && <span>{m.kpiForeignNote}</span>}
+            {kpis.freshness.feedMinutes != null && (
+              <span>
+                {m.updatedAt}: {kpis.freshness.feedMinutes} {m.minAgo}
+              </span>
+            )}
+          </div>
+        )}
       </div>
     </section>
   );
