@@ -9,6 +9,7 @@ import KpiHeader from "@/components/KpiHeader";
 import LiveUpdatesPanel from "@/components/LiveUpdatesPanel";
 import RiverWatch from "@/components/RiverWatch";
 import SearchRescue from "@/components/SearchRescue";
+import OfficialRescuedNote from "@/components/OfficialRescuedNote";
 import HelpSection from "@/components/HelpSection";
 import DonationSection from "@/components/DonationSection";
 import Footer from "@/components/Footer";
@@ -57,6 +58,7 @@ export default async function Page({
           <h2 className="text-2xl font-bold text-slate-900">{m.srTitle}</h2>
           <p className="mt-1 max-w-3xl text-sm text-slate-500">{m.srIntro}</p>
           <div className="mt-5">
+            <OfficialRescuedNote lang={lang} m={m} />
             <SearchRescue
               m={m}
               lang={lang}

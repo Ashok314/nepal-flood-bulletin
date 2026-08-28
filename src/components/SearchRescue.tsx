@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Person } from "@/lib/feed";
 import type { Lang, Messages } from "@/lib/i18n";
+import { romanKey } from "@/lib/translit";
 import PersonCard from "./PersonCard";
 
 type Tab = "missing" | "found";
@@ -29,17 +30,32 @@ export default function SearchRescue({
 
   const list = tab === "missing" ? missing : found;
 
+  // Precompute a plain blob + a romanized phonetic key per person, so Devanagari
+  // names are searchable by romanized text (e.g. "binod" finds बिनोद).
+  const indexed = useMemo(
+    () =>
+      list.map((p) => {
+        const blob = [p.name, p.nameEn, p.place, p.phone, p.note, p.when]
+          .filter(Boolean)
+          .join(" ");
+        return { p, plain: blob.toLowerCase(), key: romanKey(blob) };
+      }),
+    [list],
+  );
+
   const filtered = useMemo(() => {
-    const s = q.trim().toLowerCase();
-    if (!s) return list;
-    return list.filter((p) =>
-      [p.name, p.place, p.phone, p.note, p.when]
-        .filter(Boolean)
-        .join(" ")
-        .toLowerCase()
-        .includes(s),
-    );
-  }, [q, list]);
+    const raw = q.trim();
+    if (!raw) return list;
+    const plainQ = raw.toLowerCase();
+    const qWords = romanKey(raw).split(" ").filter(Boolean);
+    return indexed
+      .filter(
+        (a) =>
+          a.plain.includes(plainQ) ||
+          (qWords.length > 0 && qWords.every((w) => a.key.includes(w))),
+      )
+      .map((a) => a.p);
+  }, [q, indexed, list]);
 
   // Reset to first page whenever the query or tab changes.
   useEffect(() => {

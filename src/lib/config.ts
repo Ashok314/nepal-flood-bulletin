@@ -69,12 +69,34 @@ export const RESOURCES: ResourceLink[] = [
   {
     label_en: "NDRRMA (Disaster Authority)",
     label_ne: "एनडीआरआरएमए",
-    url: "https://bipadportal.gov.np/",
+    url: "https://ndrrma.gov.np/",
   },
   {
     label_en: "Nepal Red Cross Society",
     label_ne: "नेपाल रेडक्रस सोसाइटी",
     url: "https://nrcs.org/",
+  },
+];
+
+/**
+ * Official rescued lists to cross-check against. Someone listed as missing in
+ * the community feed may already appear on an official rescued list. We LINK to
+ * these authoritative sources (we do not scrape them) so people can verify.
+ * Add more district lists here as authorities publish them.
+ */
+export type OfficialSource = {
+  org: string;
+  label_en: string;
+  label_ne: string;
+  url: string;
+};
+
+export const OFFICIAL_RESCUED_SOURCES: OfficialSource[] = [
+  {
+    org: "NDRRMA / DAO Nuwakot",
+    label_en: "Rescued list, District Administration Office Nuwakot (NDRRMA)",
+    label_ne: "उद्धार गरिएकाहरूको सूची, जिल्ला प्रशासन कार्यालय नुवाकोट (एनडीआरआरएमए)",
+    url: "https://ndrrma.gov.np/np/misc-report/380",
   },
 ];
 

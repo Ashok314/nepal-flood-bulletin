@@ -29,7 +29,10 @@ const en = {
   needAttentionChip: "Need attention",
   rescuedChip: "Rescued",
   searchByName: "Search by name",
-  searchPlaceholder: "Search by name, place, or phone…",
+  crossCheckTitle: "May already be rescued?",
+  crossCheckNote:
+    "Someone listed as missing here may already be safe. Always cross-check the official rescued lists:",
+  searchPlaceholder: "Search by name (Nepali or romanized, e.g. binod), place, phone…",
   resultsCount: "records",
   showing: "Showing",
   of: "of",
@@ -157,7 +160,10 @@ const ne: typeof en = {
   needAttentionChip: "ध्यान आवश्यक",
   rescuedChip: "उद्धार गरिएको",
   searchByName: "नामबाट खोज्नुहोस्",
-  searchPlaceholder: "नाम, स्थान वा फोनबाट खोज्नुहोस्…",
+  crossCheckTitle: "उद्धार भइसकेको हुन सक्छ?",
+  crossCheckNote:
+    "यहाँ हराएको भनी सूचीबद्ध व्यक्ति सुरक्षित भइसकेको हुन सक्छ। सधैँ आधिकारिक उद्धार सूचीहरू जाँच्नुहोस्:",
+  searchPlaceholder: "नाम (नेपाली वा रोमन, जस्तै binod), स्थान वा फोनबाट खोज्नुहोस्…",
   resultsCount: "विवरण",
   showing: "देखाइँदै",
   of: "मध्ये",
