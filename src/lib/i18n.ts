@@ -33,6 +33,10 @@ const en = {
   crossCheckNote:
     "Someone listed as missing here may already be safe. Always cross-check the official rescued lists:",
   searchPlaceholder: "Search by name (Nepali or romanized, e.g. binod), place, phone…",
+  countryLabel: "Country",
+  filterAll: "All",
+  countryNepal: "Nepal",
+  countryForeign: "Foreign",
   resultsCount: "records",
   showing: "Showing",
   of: "of",
@@ -164,6 +168,10 @@ const ne: typeof en = {
   crossCheckNote:
     "यहाँ हराएको भनी सूचीबद्ध व्यक्ति सुरक्षित भइसकेको हुन सक्छ। सधैँ आधिकारिक उद्धार सूचीहरू जाँच्नुहोस्:",
   searchPlaceholder: "नाम (नेपाली वा रोमन, जस्तै binod), स्थान वा फोनबाट खोज्नुहोस्…",
+  countryLabel: "देश",
+  filterAll: "सबै",
+  countryNepal: "नेपाल",
+  countryForeign: "विदेशी",
   resultsCount: "विवरण",
   showing: "देखाइँदै",
   of: "मध्ये",

@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { SITE } from "@/lib/config";
-import { parseReportTime } from "@/lib/derive";
+import { parseReportTime, isForeign, detectCountry } from "@/lib/derive";
 
 // ---------- Upstream JSON schema (kept lenient; we never reject the whole feed
 // because one entry is odd) ----------
@@ -60,6 +60,7 @@ export type Person = {
   photo?: string;
   reportedAt?: string; // ISO time this report was filed (from the entry id)
   source?: { label: string; url: string }; // where this entry came from
+  country?: string; // "Nepal" | a specific country | "Foreign"
   status: PersonStatus;
   flagged?: boolean;
 };
@@ -207,6 +208,18 @@ function normalizeEntry(
     photo: raw.photo ?? undefined,
     reportedAt: parseReportTime(raw.id ?? undefined)?.toISOString() ?? undefined,
     source: { label: SITE.attribution.label, url: SITE.attribution.url },
+    country:
+      detectCountry(
+        [raw.name, raw.place, raw.note, raw.phone].filter(Boolean).join(" "),
+      ) ??
+      (isForeign({
+        name: raw.name || "",
+        place: raw.place ?? undefined,
+        phone: raw.phone ?? undefined,
+        note: raw.note ?? undefined,
+      })
+        ? "Foreign"
+        : "Nepal"),
     status,
   };
 }

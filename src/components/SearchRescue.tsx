@@ -6,7 +6,7 @@ import type { Lang, Messages } from "@/lib/i18n";
 import { romanKey } from "@/lib/translit";
 import PersonCard from "./PersonCard";
 
-type Tab = "missing" | "found";
+type Tab = "all" | "missing" | "found";
 
 const PAGE_SIZE = 24;
 
@@ -23,12 +23,18 @@ export default function SearchRescue({
   found: Person[];
   forms: { missing: string | null; found: string | null };
 }) {
-  const [tab, setTab] = useState<Tab>("missing");
+  const [tab, setTab] = useState<Tab>("all");
   const [q, setQ] = useState("");
+  const [country, setCountry] = useState("all");
   const [page, setPage] = useState(1);
   const topRef = useRef<HTMLDivElement>(null);
 
-  const list = tab === "missing" ? missing : found;
+  const list =
+    tab === "missing"
+      ? missing
+      : tab === "found"
+        ? found
+        : [...missing, ...found];
 
   // Precompute a plain blob + a romanized phonetic key per person, so Devanagari
   // names are searchable by romanized text (e.g. "binod" finds बिनोद).
@@ -43,24 +49,46 @@ export default function SearchRescue({
     [list],
   );
 
+  // Countries present in this list, with counts. Nepal first, Foreign last.
+  const countryOptions = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const p of list) {
+      if (p.country) counts.set(p.country, (counts.get(p.country) || 0) + 1);
+    }
+    const rank = (c: string) => (c === "Nepal" ? 0 : c === "Foreign" ? 2 : 1);
+    return [...counts.entries()].sort((a, b) =>
+      rank(a[0]) !== rank(b[0])
+        ? rank(a[0]) - rank(b[0])
+        : a[0].localeCompare(b[0]),
+    );
+  }, [list]);
+
   const filtered = useMemo(() => {
     const raw = q.trim();
-    if (!raw) return list;
     const plainQ = raw.toLowerCase();
-    const qWords = romanKey(raw).split(" ").filter(Boolean);
+    const qWords = raw ? romanKey(raw).split(" ").filter(Boolean) : [];
     return indexed
+      .filter((a) => country === "all" || a.p.country === country)
       .filter(
         (a) =>
+          !raw ||
           a.plain.includes(plainQ) ||
           (qWords.length > 0 && qWords.every((w) => a.key.includes(w))),
       )
       .map((a) => a.p);
-  }, [q, indexed, list]);
+  }, [q, country, indexed]);
 
-  // Reset to first page whenever the query or tab changes.
+  // Reset to first page on any filter change; reset country when switching tabs.
   useEffect(() => {
     setPage(1);
-  }, [q, tab]);
+  }, [q, tab, country]);
+  useEffect(() => {
+    setCountry("all");
+  }, [tab]);
+
+  function countryLabel(c: string) {
+    return c === "Nepal" ? m.countryNepal : c === "Foreign" ? m.countryForeign : c;
+  }
 
   const total = filtered.length;
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
@@ -78,6 +106,14 @@ export default function SearchRescue({
       {/* Controls */}
       <div className="mb-4 flex flex-wrap items-center gap-2">
         <div className="inline-flex rounded-lg border border-slate-200 bg-white p-1 shadow-sm">
+          <TabButton active={tab === "all"} onClick={() => setTab("all")}>
+            {m.filterAll}
+            <Count
+              active={tab === "all"}
+              n={missing.length + found.length}
+              tone="slate"
+            />
+          </TabButton>
           <TabButton active={tab === "missing"} onClick={() => setTab("missing")}>
             {m.tabMissing}
             <Count active={tab === "missing"} n={missing.length} tone="rose" />
@@ -141,6 +177,33 @@ export default function SearchRescue({
           </button>
         )}
       </div>
+
+      {/* Country filter */}
+      {countryOptions.length > 1 && (
+        <div className="mb-3 flex flex-wrap items-center gap-2">
+          <label
+            htmlFor="country-filter"
+            className="text-sm font-medium text-slate-500"
+          >
+            {m.countryLabel}:
+          </label>
+          <select
+            id="country-filter"
+            value={country}
+            onChange={(e) => setCountry(e.target.value)}
+            className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm shadow-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20"
+          >
+            <option value="all">
+              {m.filterAll} ({list.length})
+            </option>
+            {countryOptions.map(([c, n]) => (
+              <option key={c} value={c}>
+                {countryLabel(c)} ({n})
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
 
       {/* Result summary */}
       <p className="mb-3 text-sm text-slate-500">
@@ -279,12 +342,22 @@ function TabButton({
   );
 }
 
-function Count({ n, active, tone }: { n: number; active: boolean; tone: "rose" | "emerald" }) {
+function Count({
+  n,
+  active,
+  tone,
+}: {
+  n: number;
+  active: boolean;
+  tone: "rose" | "emerald" | "slate";
+}) {
   const toneCls = active
     ? "bg-white/25 text-white"
     : tone === "rose"
       ? "bg-rose-100 text-rose-700"
-      : "bg-emerald-100 text-emerald-700";
+      : tone === "emerald"
+        ? "bg-emerald-100 text-emerald-700"
+        : "bg-slate-100 text-slate-700";
   return (
     <span className={`ml-1.5 rounded-full px-1.5 py-0.5 text-[11px] font-bold ${toneCls}`}>
       {n}

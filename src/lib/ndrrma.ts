@@ -1,4 +1,5 @@
 import type { Person } from "@/lib/feed";
+import { detectCountry } from "@/lib/derive";
 
 /**
  * Live official rescued-persons data from NDRRMA's public API. Clean, structured
@@ -25,12 +26,18 @@ function normalize(rows: any[]): Person[] {
     const loc = r?.rescued_location ?? {};
     const place = String(loc?.title_ne || loc?.title || "").trim() || undefined;
 
+    const natRaw = String(r?.nationality ?? "").trim().toLowerCase();
+    const remarks = String(r?.remarks ?? "").trim();
+    let country: string | undefined;
+    if (r?.country) country = String(r.country).trim();
+    else if (natRaw === "nepali") country = "Nepal";
+    else if (natRaw === "foreign")
+      country = detectCountry([nameEn, nameNe, remarks].join(" ")) ?? "Foreign";
+
     const parts: string[] = [];
     if (r?.rescued_date) parts.push(`Rescued ${r.rescued_date}`);
     if (r?.status?.title) parts.push(String(r.status.title));
-    const nat = String(r?.nationality ?? "").trim();
-    if (nat && nat.toLowerCase() !== "nepali") parts.push(nat);
-    const remarks = String(r?.remarks ?? "").trim();
+    if (country && country !== "Nepal") parts.push(country);
     if (remarks) parts.push(remarks);
 
     return {
@@ -41,6 +48,7 @@ function normalize(rows: any[]): Person[] {
       age: r?.age != null ? String(r.age) : undefined,
       note: parts.join(" · ") || undefined,
       source: SOURCE,
+      country,
       status: "found" as const,
     };
   });

@@ -73,6 +73,30 @@ export function isForeign(person: Pick<Person, "place" | "note" | "phone" | "nam
   return FOREIGN_KEYWORDS.some((k) => hay.includes(k));
 }
 
+// Country detection from free text (place / note / name / phone). Best-effort:
+// used to give foreign entries a specific country when the data reveals one.
+const COUNTRY_KEYWORDS: { country: string; tokens: string[] }[] = [
+  { country: "India", tokens: ["india", "indian", "tamil nadu", "coimbatore", "karur", "chennai", "kerala", "bangalore", "bengaluru", "new delhi", "mumbai", "kolkata", "bihar", "+91"] },
+  { country: "USA", tokens: ["usa", "u.s.", "united states", "america", "american", "texas", "dallas", "california", "new york"] },
+  { country: "China", tokens: ["china", "chinese", "beijing", "shanghai", "+86"] },
+  { country: "Bangladesh", tokens: ["bangladesh", "+880"] },
+  { country: "Bhutan", tokens: ["bhutan"] },
+  { country: "Sri Lanka", tokens: ["sri lanka", "srilanka"] },
+  { country: "Malaysia", tokens: ["malaysia"] },
+  { country: "United Kingdom", tokens: ["united kingdom", "england", "london", "britain", "+44"] },
+  { country: "Australia", tokens: ["australia", "+61"] },
+  { country: "UAE", tokens: ["u.a.e", "uae", "dubai", "emirates", "abu dhabi"] },
+];
+
+export function detectCountry(text?: string): string | null {
+  if (!text) return null;
+  const hay = ` ${text.toLowerCase()} `;
+  for (const c of COUNTRY_KEYWORDS) {
+    if (c.tokens.some((t) => hay.includes(t))) return c.country;
+  }
+  return null;
+}
+
 export type PersonTags = { minor: boolean; elderly: boolean; foreign: boolean };
 
 export function personTags(person: Person): PersonTags {
