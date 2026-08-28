@@ -22,6 +22,7 @@ const TTL_MS = 10 * 60 * 1000;
 const NE_DIGITS = "०१२३४५६७८९";
 const toLatin = (s = "") => s.replace(/[०-९]/g, (d) => String(NE_DIGITS.indexOf(d)));
 const toDate = (s = "") => toLatin(s).replace(/।/g, "/").trim(); // २०८३।०५।१० -> 2083/05/10
+const digits = (s = "") => toLatin(s).replace(/[^0-9]/g, ""); // "—"/"१४" -> ""/"14"
 const isNum = (c = "") => /^[0-9०-९]+$/.test(c.trim());
 const joinNote = (...xs: (string | undefined)[]) =>
   xs.map((x) => (x || "").trim()).filter(Boolean).join(" · ");
@@ -87,6 +88,25 @@ const SECTIONS: Section[] = [
     id: "heli-ktm", country: "Nepal",
     map: (c) => ({ name: c[1], note: "काठमाडौं हेलि उद्धार" }),
   },
+  {
+    // Injured brought to Kathmandu hospitals for treatment. Two sub-tables:
+    // 7 cols [sn,name,age,gender,addr,status,remark] and
+    // 8 cols [sn,name,age,addr,contact,rescueLoc,hospital,status].
+    id: "treat", country: "Nepal",
+    map: (c) => {
+      if (c.length >= 8) {
+        const phone = /\d{6,}/.test(c[4] || "") ? c[4] : undefined;
+        return {
+          name: c[1], age: digits(c[2]), place: c[3], phone,
+          note: joinNote(c[7], c[6], "उपचार · काठमाडौं"),
+        };
+      }
+      return {
+        name: c[1], age: digits(c[2]), place: c[4],
+        note: joinNote(c[3], c[5], c[6], "उपचार · काठमाडौं"),
+      };
+    },
+  },
 ];
 
 // ---- HTML table parsing ----------------------------------------------------
@@ -126,6 +146,7 @@ export function parseBulletin(html: string): Person[] {
         id: `bul-${sec.id}-${toLatin(c[0])}`,
         name,
         place: p.place?.trim() || undefined,
+        phone: p.phone?.trim() || undefined,
         age: p.age && p.age !== "-" ? p.age : undefined,
         when: p.when || undefined,
         note: p.note || undefined,
