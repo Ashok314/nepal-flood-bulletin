@@ -155,12 +155,12 @@ const en = {
   heroScope: "Rasuwa · Nuwakot · Dhading — Bhotekoshi / Trishuli Flood",
   heroTitle: "Find someone. Report someone. Check a status.",
   heroSubtitle:
-    "Search Nepal's flood missing & found directory. Statuses here are pulled from official lists and verified community reports — not guesses.",
+    "Search Nepal's flood missing & found directory. Every card shows its source — always verify before acting.",
   searchCta: "Search",
   heroSearchHelp:
     'Works with both scripts — try "Binod" or "बिनोद". You can also filter by country and status below.',
   heroLiveSynced:
-    "Live-synced from official NDRRMA lists & the verified community bulletin",
+    "Live-synced from official NDRRMA lists & the community bulletin",
   heroLastSynced: "Last synced",
   heroHowItWorks: "How this works",
   heroReportMissing: "Report Missing",
@@ -318,12 +318,12 @@ const ne: typeof en = {
   heroScope: "रसुवा · नुवाकोट · धादिङ — भोटेकोशी / त्रिशूली बाढी",
   heroTitle: "आफ्नो मान्छे खोज्नुहोस्। रिपोर्ट गर्नुहोस्। अवस्था हेर्नुहोस्।",
   heroSubtitle:
-    "नेपाल बाढीका हराएका र भेटिएका व्यक्तिको खोजी। यहाँका अवस्था आधिकारिक सूची र प्रमाणित सामुदायिक विवरणबाट — अनुमान होइन।",
+    "नेपाल बाढीका हराएका र भेटिएका व्यक्तिको खोजी। प्रत्येक कार्डमा स्रोत उल्लेख छ — कार्य गर्नुअघि सधैँ पुष्टि गर्नुहोस्।",
   searchCta: "खोज्नुहोस्",
   heroSearchHelp:
     'दुवै लिपिमा काम गर्छ — "Binod" वा "बिनोद" प्रयास गर्नुहोस्। तल देश र अवस्थाअनुसार पनि छान्न सकिन्छ।',
   heroLiveSynced:
-    "आधिकारिक NDRRMA सूची र प्रमाणित सामुदायिक बुलेटिनबाट प्रत्यक्ष अद्यावधिक",
+    "आधिकारिक NDRRMA सूची र सामुदायिक बुलेटिनबाट प्रत्यक्ष अद्यावधिक",
   heroLastSynced: "पछिल्लो अद्यावधिक",
   heroHowItWorks: "यो कसरी काम गर्छ",
   heroReportMissing: "हराएको रिपोर्ट",
