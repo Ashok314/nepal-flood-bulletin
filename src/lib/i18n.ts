@@ -60,7 +60,7 @@ const en = {
 
   updatesTitle: "Official updates & posts",
   updatesIntro:
-    "Human-verified links to posts from official handles and agencies.",
+    "Links to posts from official handles and agencies. Check the source before acting.",
   updatesEmpty: "No updates posted yet.",
   verified: "Verified",
   unverified: "Unverified",
@@ -224,7 +224,7 @@ const ne: typeof en = {
 
   updatesTitle: "आधिकारिक अपडेट तथा पोस्ट",
   updatesIntro:
-    "आधिकारिक ह्यान्डल र निकायहरूका पोस्टका मानवद्वारा प्रमाणित लिङ्कहरू।",
+    "आधिकारिक ह्यान्डल र निकायहरूका पोस्टका लिङ्कहरू। कार्य गर्नुअघि स्रोत जाँच्नुहोस्।",
   updatesEmpty: "अहिलेसम्म कुनै अपडेट छैन।",
   verified: "प्रमाणित",
   unverified: "अप्रमाणित",
