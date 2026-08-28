@@ -8,7 +8,6 @@ import { romanKey } from "@/lib/translit";
 import type { Person } from "@/lib/feed";
 import { deriveKpis } from "@/lib/metrics";
 import { getMessages, isLang, type Lang } from "@/lib/i18n";
-import { BUILDERS } from "@/lib/config";
 import Hero from "@/components/Hero";
 import KpiHeader from "@/components/KpiHeader";
 import LiveUpdatesPanel from "@/components/LiveUpdatesPanel";
@@ -65,26 +64,6 @@ export default async function Page({
 
   return (
     <div id="top">
-      {/* Top invite: solicit more data sources / feedback (purposeful, not a credit) */}
-      <div className="bg-slate-900 text-slate-300">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-x-2 gap-y-1 px-4 py-2 text-xs sm:justify-start">
-          <span>💡 {m.topInviteLabel}</span>
-          {BUILDERS.map((b, i) => (
-            <span key={b.handle}>
-              {i > 0 && <span className="mx-1 text-slate-600">·</span>}
-              <a
-                href={b.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-semibold text-white hover:text-amber-300"
-              >
-                {b.handle}
-              </a>
-            </span>
-          ))}
-        </div>
-      </div>
-
       <Hero
         lang={lang}
         m={m}
@@ -94,16 +73,21 @@ export default async function Page({
           stale: feed.stale,
         }}
         counts={merged.counts}
+        forms={merged.forms}
       />
 
-      <KpiHeader lang={lang} m={m} kpis={kpis} />
+      <div id="overview" className="scroll-mt-16">
+        <KpiHeader lang={lang} m={m} kpis={kpis} />
+      </div>
 
-      <LiveUpdatesPanel m={m} lang={lang} items={updates} />
+      <div id="updates" className="scroll-mt-16">
+        <LiveUpdatesPanel m={m} lang={lang} items={updates} />
+      </div>
 
       <main>
         <section
           id="search-rescue"
-          className="mx-auto max-w-6xl px-4 py-10"
+          className="mx-auto max-w-6xl scroll-mt-16 px-4 py-10"
         >
           <h2 className="text-2xl font-bold text-slate-900">{m.srTitle}</h2>
           <p className="mt-1 max-w-3xl text-sm text-slate-500">{m.srIntro}</p>

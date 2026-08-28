@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import type { Person } from "@/lib/feed";
 import type { Lang, Messages } from "@/lib/i18n";
 import { romanKey } from "@/lib/translit";
+import { useSearchQuery } from "@/lib/searchStore";
 import PersonCard from "./PersonCard";
 
 type Tab = "all" | "missing" | "found";
@@ -24,7 +25,7 @@ export default function SearchRescue({
   forms: { missing: string | null; found: string | null };
 }) {
   const [tab, setTab] = useState<Tab>("all");
-  const [q, setQ] = useState("");
+  const [q, setQ] = useSearchQuery(); // shared with the hero search box
   const [country, setCountry] = useState("all");
   const [rescueStatus, setRescueStatus] = useState("all");
   const [page, setPage] = useState(1);

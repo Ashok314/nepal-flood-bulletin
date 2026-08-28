@@ -146,6 +146,29 @@ const en = {
   suggestionsLabel: "Found an issue or have a suggestion? Let the maintainers know:",
   topInviteLabel:
     "Know an official data source we should add, or have feedback? Reach out:",
+
+  // Search-first hero
+  navSearch: "Search & Found",
+  navOverview: "Overview",
+  navUpdates: "Official Updates",
+  navDonate: "Donate",
+  heroScope: "Rasuwa · Nuwakot · Dhading — Bhotekoshi / Trishuli Flood",
+  heroTitle: "Find someone. Report someone. Check a status.",
+  heroSubtitle:
+    "Search Nepal's flood missing & found directory. Statuses here are pulled from official lists and verified community reports — not guesses.",
+  searchCta: "Search",
+  heroSearchHelp:
+    'Works with both scripts — try "Binod" or "बिनोद". You can also filter by country and status below.',
+  heroLiveSynced:
+    "Live-synced from official NDRRMA lists & the verified community bulletin",
+  heroLastSynced: "Last synced",
+  heroHowItWorks: "How this works",
+  heroReportMissing: "Report Missing",
+  heroMarkFound: "Mark Someone Found",
+  heroEmergencyBtn: "Emergency numbers",
+  statMissing: "missing",
+  statFound: "found",
+  statTracked: "records tracked",
 };
 
 const ne: typeof en = {
@@ -286,6 +309,29 @@ const ne: typeof en = {
   dataSourcesLabel: "तथ्याङ्क स्रोतहरू",
   suggestionsLabel: "कुनै समस्या वा सुझाव भए मर्मतकर्तालाई जानकारी दिनुहोस्:",
   topInviteLabel: "थप्नुपर्ने आधिकारिक स्रोत वा सुझाव छ? सम्पर्क गर्नुहोस्:",
+
+  // Search-first hero
+  navSearch: "खोज / भेटिएका",
+  navOverview: "सारांश",
+  navUpdates: "आधिकारिक अपडेट",
+  navDonate: "सहयोग",
+  heroScope: "रसुवा · नुवाकोट · धादिङ — भोटेकोशी / त्रिशूली बाढी",
+  heroTitle: "आफ्नो मान्छे खोज्नुहोस्। रिपोर्ट गर्नुहोस्। अवस्था हेर्नुहोस्।",
+  heroSubtitle:
+    "नेपाल बाढीका हराएका र भेटिएका व्यक्तिको खोजी। यहाँका अवस्था आधिकारिक सूची र प्रमाणित सामुदायिक विवरणबाट — अनुमान होइन।",
+  searchCta: "खोज्नुहोस्",
+  heroSearchHelp:
+    'दुवै लिपिमा काम गर्छ — "Binod" वा "बिनोद" प्रयास गर्नुहोस्। तल देश र अवस्थाअनुसार पनि छान्न सकिन्छ।',
+  heroLiveSynced:
+    "आधिकारिक NDRRMA सूची र प्रमाणित सामुदायिक बुलेटिनबाट प्रत्यक्ष अद्यावधिक",
+  heroLastSynced: "पछिल्लो अद्यावधिक",
+  heroHowItWorks: "यो कसरी काम गर्छ",
+  heroReportMissing: "हराएको रिपोर्ट",
+  heroMarkFound: "भेटिएको जनाउनुहोस्",
+  heroEmergencyBtn: "आपत्‌कालीन नम्बर",
+  statMissing: "हराएका",
+  statFound: "भेटिएका",
+  statTracked: "कुल विवरण",
 };
 
 export const messages = { en, ne } as const;
