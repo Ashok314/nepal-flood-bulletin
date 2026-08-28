@@ -72,6 +72,10 @@ const SECTIONS: Section[] = [
     map: (c) => ({ name: c[1], note: "त्रिशूली-१ उद्धार" }),
   },
   {
+    id: "india-cross", country: "India",
+    map: (c) => ({ name: c[1], note: "भारतीय · चीनबाट नेपाल सुरक्षित प्रवेश" }),
+  },
+  {
     id: "army-heli-res", country: "Nepal",
     map: (c) => ({ name: c[1], place: c[2], age: toLatin(c[3]), when: toDate(c[6]), note: joinNote(c[4], c[5], "सेना/हेलि उद्धार") }),
   },
