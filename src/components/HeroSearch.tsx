@@ -20,9 +20,9 @@ export default function HeroSearch({ m }: { m: Messages }) {
         e.preventDefault();
         jumpToResults();
       }}
-      className="rounded-2xl bg-white p-2.5 shadow-xl ring-1 ring-black/5"
+      className="rounded-2xl bg-white p-2 shadow-xl ring-1 ring-black/5 sm:p-2.5"
     >
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+      <div className="flex flex-row items-center gap-2">
         <div className="relative flex-1">
           <svg
             viewBox="0 0 24 24"
@@ -59,12 +59,14 @@ export default function HeroSearch({ m }: { m: Messages }) {
         </div>
         <button
           type="submit"
-          className="rounded-xl bg-brand px-6 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-brand-dark"
+          className="shrink-0 rounded-xl bg-brand px-4 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-brand-dark sm:px-6"
         >
           {m.searchCta}
         </button>
       </div>
-      <p className="mt-1.5 px-1.5 pb-0.5 text-xs text-slate-500">{m.heroSearchHelp}</p>
+      <p className="mt-1.5 hidden px-1.5 pb-0.5 text-xs text-slate-500 sm:block">
+        {m.heroSearchHelp}
+      </p>
     </form>
   );
 }

@@ -61,25 +61,25 @@ export default function Hero({
 
       {/* Search-first hero */}
       <div className="bg-gradient-to-b from-brand to-brand-dark text-white">
-        <div className="mx-auto max-w-6xl px-4 py-8 sm:py-12">
+        <div className="mx-auto max-w-6xl px-4 py-5 sm:py-12">
           <span className="inline-block rounded-full bg-white/12 px-3 py-1 text-xs font-medium text-white/90 ring-1 ring-white/15">
             {m.heroScope}
           </span>
 
-          <h1 className="mt-4 text-3xl font-extrabold leading-tight tracking-tight sm:text-5xl">
+          <h1 className="mt-2.5 text-2xl font-extrabold leading-tight tracking-tight sm:mt-4 sm:text-5xl">
             {m.heroTitle}
           </h1>
-          <p className="mt-3 max-w-2xl text-sm text-white/80 sm:text-base">
+          <p className="mt-2 max-w-2xl text-xs text-white/75 sm:mt-3 sm:text-base">
             {m.heroSubtitle}
           </p>
 
           {/* The search box (drives the results list below) */}
-          <div className="mt-6 max-w-4xl">
+          <div className="mt-4 max-w-4xl sm:mt-6">
             <HeroSearch m={m} />
           </div>
 
           {/* Live-sync status */}
-          <p className="mt-4 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-white/75">
+          <p className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-white/75 sm:mt-4">
             {meta.stale ? (
               <span className="inline-flex items-center gap-1.5">
                 <span className="h-2 w-2 rounded-full bg-amber-300" />
@@ -89,11 +89,11 @@ export default function Hero({
               <>
                 <span className="inline-flex items-center gap-1.5">
                   <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-300" />
-                  {m.heroLiveSynced}
+                  <span className="hidden sm:inline">{m.heroLiveSynced}</span>
                 </span>
                 {meta.updatedAt && (
                   <>
-                    <span className="text-white/40">·</span>
+                    <span className="hidden text-white/40 sm:inline">·</span>
                     <span>
                       {m.heroLastSynced}:{" "}
                       <strong className="font-semibold text-white/90">
@@ -111,13 +111,13 @@ export default function Hero({
           </p>
 
           {/* Actions */}
-          <div className="mt-5 flex flex-wrap gap-2">
+          <div className="mt-4 flex flex-wrap gap-2">
             {forms.missing && (
               <a
                 href={forms.missing}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded-lg bg-white px-4 py-2 text-sm font-semibold text-brand-dark shadow-sm hover:bg-white/90"
+                className="rounded-lg bg-white px-3 py-2 text-sm font-semibold sm:px-4 text-brand-dark shadow-sm hover:bg-white/90"
               >
                 + {m.heroReportMissing}
               </a>
@@ -127,21 +127,21 @@ export default function Hero({
                 href={forms.found}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded-lg bg-white/15 px-4 py-2 text-sm font-semibold text-white ring-1 ring-white/25 hover:bg-white/25"
+                className="rounded-lg bg-white/15 px-3 py-2 text-sm font-semibold sm:px-4 text-white ring-1 ring-white/25 hover:bg-white/25"
               >
                 ✓ {m.heroMarkFound}
               </a>
             )}
             <a
               href="#help"
-              className="rounded-lg bg-white/10 px-4 py-2 text-sm font-semibold text-white/90 ring-1 ring-white/20 hover:bg-white/20"
+              className="rounded-lg bg-white/10 px-3 py-2 text-sm font-semibold sm:px-4 text-white/90 ring-1 ring-white/20 hover:bg-white/20"
             >
               {m.heroEmergencyBtn}
             </a>
           </div>
 
           {/* Counts */}
-          <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-1 text-sm text-white/80">
+          <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-white/80">
             <span>
               <strong className="font-bold text-white">
                 {counts.missing.toLocaleString()}
