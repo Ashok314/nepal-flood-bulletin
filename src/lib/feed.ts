@@ -208,7 +208,12 @@ function normalizeEntry(
     note: raw.note ?? undefined,
     photo: raw.photo ?? undefined,
     reportedAt: parseReportTime(raw.id ?? undefined)?.toISOString() ?? undefined,
-    source: { label: SITE.attribution.label, url: SITE.attribution.url },
+    source: {
+      label: SITE.attribution.label,
+      // Deep-link to the exact section on the source site so people land on the
+      // real data (rescued vs missing), not a generic homepage.
+      url: `${SITE.attribution.url}#${status === "found" ? "fam-found" : "fam-missing"}`,
+    },
     country:
       detectCountry(
         [raw.name, raw.place, raw.note, raw.phone].filter(Boolean).join(" "),
