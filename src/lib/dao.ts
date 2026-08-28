@@ -111,6 +111,10 @@ const ROWS: Row[] = [
   { s: 652, n: "पूर्ण चन्द्र वि.क.", a: "गोरखा", g: "23", x: "M" },
   { s: 653, n: "हरि बहादुर श्रेष्ठ", a: "रामेछाप", g: "26", x: "M" },
   { s: 654, n: "पेम्बा तामाङ", a: "रसुवा", g: "-", x: "M" },
+  // Final page (rows 758–771 are Indian nationals); these 3 were not yet in the API.
+  { s: 765, n: "पुडुगुरली", a: "भारत", g: "62", x: "F", c: "India" },
+  { s: 766, n: "विनायकी", a: "भारत", g: "63", x: "F", c: "India" },
+  { s: 767, n: "मैथिली", a: "भारत", g: "39", x: "F", c: "India" },
 ];
 
 export function getDaoRescued(): Person[] {

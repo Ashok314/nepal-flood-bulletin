@@ -1,15 +1,17 @@
 import { getFeed } from "@/lib/feed";
 import { getRivers } from "@/lib/rivers";
-// import { getRecentUpdates } from "@/lib/updates"; // paused: focusing on people
+import { getRecentUpdates } from "@/lib/updates";
 import { getNdrrmaRescued } from "@/lib/ndrrma";
+import { getBulletinRescued } from "@/lib/bulletin";
 import { getDaoRescued } from "@/lib/dao";
 import { romanKey } from "@/lib/translit";
+import type { Person } from "@/lib/feed";
 import { deriveKpis } from "@/lib/metrics";
 import { getMessages, isLang, type Lang } from "@/lib/i18n";
 import { BUILDERS } from "@/lib/config";
 import Hero from "@/components/Hero";
 import KpiHeader from "@/components/KpiHeader";
-// import LiveUpdatesPanel from "@/components/LiveUpdatesPanel"; // paused
+import LiveUpdatesPanel from "@/components/LiveUpdatesPanel";
 // import RiverWatch from "@/components/RiverWatch"; // paused: focusing on people
 import SearchRescue from "@/components/SearchRescue";
 import HelpSection from "@/components/HelpSection";
@@ -26,23 +28,33 @@ export default async function Page({
   const lang: Lang = isLang(searchParams.lang) ? searchParams.lang : "en";
   const m = getMessages(lang);
 
-  const [feed, rivers, ndrrma] = await Promise.all([
+  const [feed, rivers, updates, ndrrma, bulletin] = await Promise.all([
     getFeed(),
     getRivers(), // still used for the situation KPI (rivers above warning)
+    getRecentUpdates(),
     getNdrrmaRescued(),
+    getBulletinRescued(), // 8 official rescue lists parsed from the bulletin
   ]);
 
-  // Merge official rescued people into the Rescued list, each keeping its own
-  // source. The DAO Rasuwa snapshot is deduped against the live NDRRMA data
-  // (by romanized name + age) so the count reflects genuinely-new people.
-  const ndrrmaKeys = new Set(
-    ndrrma.map((p) => `${romanKey(p.name)}|${p.age || ""}`),
-  );
-  const daoNew = getDaoRescued().filter(
-    (p) => !ndrrmaKeys.has(`${romanKey(p.name)}|${p.age || ""}`),
-  );
+  // Merge every rescued source into one searchable list, each card keeping its
+  // own source + deep-link. Deduped by romanized name + age so a person listed
+  // in several places shows once. Priority (first kept): live NDRRMA API, then
+  // the bulletin's rescue lists, community-confirmed, then the DAO snapshot.
+  const dedupeFound = (lists: Person[][]): Person[] => {
+    const seen = new Set<string>();
+    const out: Person[] = [];
+    for (const list of lists) {
+      for (const p of list) {
+        const key = `${romanKey(p.name)}|${p.age || ""}`;
+        if (p.name && p.name !== "-" && seen.has(key)) continue;
+        seen.add(key);
+        out.push(p);
+      }
+    }
+    return out;
+  };
 
-  const found = [...feed.found, ...ndrrma, ...daoNew];
+  const found = dedupeFound([ndrrma, bulletin, feed.found, getDaoRescued()]);
   const merged = {
     ...feed,
     found,
@@ -86,8 +98,7 @@ export default async function Page({
 
       <KpiHeader lang={lang} m={m} kpis={kpis} />
 
-      {/* Live updates panel paused to keep focus on people search
-      <LiveUpdatesPanel m={m} lang={lang} items={updates} /> */}
+      <LiveUpdatesPanel m={m} lang={lang} items={updates} />
 
       <main>
         <section
