@@ -39,6 +39,19 @@ export const SITE = {
   },
 } as const;
 
+// People who built / maintain this awareness site (subtle credit, top of page).
+export const BUILDERS: { handle: string; url: string }[] = [
+  { handle: "@yash_paudel", url: "https://x.com/yash_paudel" },
+  { handle: "@sanzinme", url: "https://x.com/sanzinme" },
+];
+
+// Government / official data sources we gather from (credited in the footer).
+export const DATA_SOURCES: { label: string; url: string }[] = [
+  { label: "NDRRMA", url: "https://ndrrma.gov.np/" },
+  { label: "DHM (Hydrology & Meteorology)", url: "https://www.dhm.gov.np/" },
+  { label: "DAO Rasuwa", url: "https://daorasuwa.moha.gov.np/" },
+];
+
 export type Hotline = {
   label_en: string;
   label_ne: string;
@@ -72,6 +85,11 @@ export const RESOURCES: ResourceLink[] = [
     label_en: "Official rescued list, DAO Nuwakot (NDRRMA)",
     label_ne: "आधिकारिक उद्धार सूची, जिल्ला प्रशासन कार्यालय नुवाकोट (एनडीआरआरएमए)",
     url: "https://ndrrma.gov.np/np/misc-report/380",
+  },
+  {
+    label_en: "DAO Rasuwa (full district rescued details)",
+    label_ne: "जिल्ला प्रशासन कार्यालय, रसुवा (पूर्ण उद्धार विवरण)",
+    url: "https://daorasuwa.moha.gov.np/",
   },
   {
     label_en: "NDRRMA (Disaster Authority)",

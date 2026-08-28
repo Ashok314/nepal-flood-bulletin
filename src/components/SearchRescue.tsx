@@ -26,6 +26,7 @@ export default function SearchRescue({
   const [tab, setTab] = useState<Tab>("all");
   const [q, setQ] = useState("");
   const [country, setCountry] = useState("all");
+  const [rescueStatus, setRescueStatus] = useState("all");
   const [page, setPage] = useState(1);
   const topRef = useRef<HTMLDivElement>(null);
 
@@ -63,6 +64,16 @@ export default function SearchRescue({
     );
   }, [list]);
 
+  // Rescue statuses present (Safe / Injured / Under Medical Care / …), with counts.
+  const statusOptions = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const p of list) {
+      if (p.rescueStatus)
+        counts.set(p.rescueStatus, (counts.get(p.rescueStatus) || 0) + 1);
+    }
+    return [...counts.entries()].sort((a, b) => b[1] - a[1]);
+  }, [list]);
+
   const filtered = useMemo(() => {
     const raw = q.trim();
     const plainQ = raw.toLowerCase();
@@ -70,21 +81,36 @@ export default function SearchRescue({
     return indexed
       .filter((a) => country === "all" || a.p.country === country)
       .filter(
+        (a) => rescueStatus === "all" || a.p.rescueStatus === rescueStatus,
+      )
+      .filter(
         (a) =>
           !raw ||
           a.plain.includes(plainQ) ||
           (qWords.length > 0 && qWords.every((w) => a.key.includes(w))),
       )
       .map((a) => a.p);
-  }, [q, country, indexed]);
+  }, [q, country, rescueStatus, indexed]);
 
-  // Reset to first page on any filter change; reset country when switching tabs.
+  // Reset page on any filter change; reset filters when switching tabs.
   useEffect(() => {
     setPage(1);
-  }, [q, tab, country]);
+  }, [q, tab, country, rescueStatus]);
   useEffect(() => {
     setCountry("all");
+    setRescueStatus("all");
   }, [tab]);
+
+  function statusLabel(s: string) {
+    const ne: Record<string, string> = {
+      Safe: "सुरक्षित",
+      Injured: "घाइते",
+      "Under Medical Care": "उपचाररत",
+      "Transferred to Relief Camp": "राहत शिविरमा",
+      Rescued: "उद्धार गरिएको",
+    };
+    return lang === "ne" && ne[s] ? ne[s] : s;
+  }
 
   function countryLabel(c: string) {
     return c === "Nepal" ? m.countryNepal : c === "Foreign" ? m.countryForeign : c;
@@ -178,30 +204,57 @@ export default function SearchRescue({
         )}
       </div>
 
-      {/* Country filter */}
-      {countryOptions.length > 1 && (
-        <div className="mb-3 flex flex-wrap items-center gap-2">
-          <label
-            htmlFor="country-filter"
-            className="text-sm font-medium text-slate-500"
-          >
-            {m.countryLabel}:
-          </label>
-          <select
-            id="country-filter"
-            value={country}
-            onChange={(e) => setCountry(e.target.value)}
-            className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm shadow-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20"
-          >
-            <option value="all">
-              {m.filterAll} ({list.length})
-            </option>
-            {countryOptions.map(([c, n]) => (
-              <option key={c} value={c}>
-                {countryLabel(c)} ({n})
-              </option>
-            ))}
-          </select>
+      {/* Filters: country + rescue status */}
+      {(countryOptions.length > 1 || statusOptions.length > 0) && (
+        <div className="mb-3 flex flex-wrap items-center gap-x-4 gap-y-2">
+          {countryOptions.length > 1 && (
+            <div className="flex items-center gap-2">
+              <label
+                htmlFor="country-filter"
+                className="text-sm font-medium text-slate-500"
+              >
+                {m.countryLabel}:
+              </label>
+              <select
+                id="country-filter"
+                value={country}
+                onChange={(e) => setCountry(e.target.value)}
+                className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm shadow-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20"
+              >
+                <option value="all">
+                  {m.filterAll} ({list.length})
+                </option>
+                {countryOptions.map(([c, n]) => (
+                  <option key={c} value={c}>
+                    {countryLabel(c)} ({n})
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+          {statusOptions.length > 0 && (
+            <div className="flex items-center gap-2">
+              <label
+                htmlFor="status-filter"
+                className="text-sm font-medium text-slate-500"
+              >
+                {m.rescueStatusLabel}:
+              </label>
+              <select
+                id="status-filter"
+                value={rescueStatus}
+                onChange={(e) => setRescueStatus(e.target.value)}
+                className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm shadow-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20"
+              >
+                <option value="all">{m.filterAll}</option>
+                {statusOptions.map(([s, n]) => (
+                  <option key={s} value={s}>
+                    {statusLabel(s)} ({n})
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
         </div>
       )}
 

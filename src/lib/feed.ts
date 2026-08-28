@@ -61,6 +61,7 @@ export type Person = {
   reportedAt?: string; // ISO time this report was filed (from the entry id)
   source?: { label: string; url: string }; // where this entry came from
   country?: string; // "Nepal" | a specific country | "Foreign"
+  rescueStatus?: string; // NDRRMA status: Safe / Injured / Under Medical Care / …
   status: PersonStatus;
   flagged?: boolean;
 };

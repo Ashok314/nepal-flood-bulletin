@@ -22,7 +22,7 @@ const en = {
   srIntro:
     "From the community bulletin and official NDRRMA rescued lists. Each card shows its source. Verify before acting.",
   tabMissing: "Need attention",
-  tabFound: "Rescued & safe",
+  tabFound: "Rescued",
   statusMissing: "Missing",
   statusRescued: "Rescued",
   emergencyRelief: "Emergency relief",
@@ -37,6 +37,7 @@ const en = {
   filterAll: "All",
   countryNepal: "Nepal",
   countryForeign: "Foreign",
+  rescueStatusLabel: "Status",
   resultsCount: "records",
   showing: "Showing",
   of: "of",
@@ -140,6 +141,11 @@ const en = {
   creditBy: "Data & original bulletin by",
   creditThanks: "full credit to the original author",
   creditView: "View original",
+  builtBy: "Built by",
+  dataSourcesLabel: "Data sources",
+  suggestionsLabel: "Found an issue or have a suggestion? Let the maintainers know:",
+  topInviteLabel:
+    "Know an official data source we should add, or have feedback? Reach out:",
 };
 
 const ne: typeof en = {
@@ -157,7 +163,7 @@ const ne: typeof en = {
   srIntro:
     "सामुदायिक बुलेटिन र आधिकारिक NDRRMA उद्धार सूचीबाट। प्रत्येक कार्डमा स्रोत देखाइएको छ। कार्य गर्नुअघि पुष्टि गर्नुहोस्।",
   tabMissing: "ध्यान आवश्यक",
-  tabFound: "उद्धार / सुरक्षित",
+  tabFound: "उद्धार गरिएको",
   statusMissing: "हराएको",
   statusRescued: "उद्धार गरिएको",
   emergencyRelief: "आपत्‌कालीन राहत",
@@ -172,6 +178,7 @@ const ne: typeof en = {
   filterAll: "सबै",
   countryNepal: "नेपाल",
   countryForeign: "विदेशी",
+  rescueStatusLabel: "अवस्था",
   resultsCount: "विवरण",
   showing: "देखाइँदै",
   of: "मध्ये",
@@ -275,6 +282,10 @@ const ne: typeof en = {
   creditBy: "तथ्याङ्क तथा मूल बुलेटिन:",
   creditThanks: "मूल स्रष्टालाई पूर्ण श्रेय",
   creditView: "मूल हेर्नुहोस्",
+  builtBy: "निर्माण:",
+  dataSourcesLabel: "तथ्याङ्क स्रोतहरू",
+  suggestionsLabel: "कुनै समस्या वा सुझाव भए मर्मतकर्तालाई जानकारी दिनुहोस्:",
+  topInviteLabel: "थप्नुपर्ने आधिकारिक स्रोत वा सुझाव छ? सम्पर्क गर्नुहोस्:",
 };
 
 export const messages = { en, ne } as const;

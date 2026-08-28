@@ -49,6 +49,7 @@ function normalize(rows: any[]): Person[] {
       note: parts.join(" · ") || undefined,
       source: SOURCE,
       country,
+      rescueStatus: r?.status?.title ? String(r.status.title) : undefined,
       status: "found" as const,
     };
   });
