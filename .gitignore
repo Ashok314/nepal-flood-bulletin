@@ -8,3 +8,5 @@
 *.db
 *.db-journal
 next-env.d.ts
+# Downloaded source documents (not committed)
+*.pdf

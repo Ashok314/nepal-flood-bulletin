@@ -59,6 +59,7 @@ export type Person = {
   note?: string;
   photo?: string;
   reportedAt?: string; // ISO time this report was filed (from the entry id)
+  source?: { label: string; url: string }; // where this entry came from
   status: PersonStatus;
   flagged?: boolean;
 };
@@ -205,6 +206,7 @@ function normalizeEntry(
     note: raw.note ?? undefined,
     photo: raw.photo ?? undefined,
     reportedAt: parseReportTime(raw.id ?? undefined)?.toISOString() ?? undefined,
+    source: { label: SITE.attribution.label, url: SITE.attribution.url },
     status,
   };
 }

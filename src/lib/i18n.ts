@@ -20,7 +20,7 @@ const en = {
 
   srTitle: "Search & Rescue",
   srIntro:
-    "Reported by the community. Verify directly before acting.",
+    "From the community bulletin and official NDRRMA rescued lists. Each card shows its source. Verify before acting.",
   tabMissing: "Need attention",
   tabFound: "Rescued & safe",
   statusMissing: "Missing",
@@ -151,7 +151,7 @@ const ne: typeof en = {
 
   srTitle: "खोज तथा उद्धार",
   srIntro:
-    "समुदायद्वारा रिपोर्ट गरिएको। कार्य गर्नुअघि प्रत्यक्ष पुष्टि गर्नुहोस्।",
+    "सामुदायिक बुलेटिन र आधिकारिक NDRRMA उद्धार सूचीबाट। प्रत्येक कार्डमा स्रोत देखाइएको छ। कार्य गर्नुअघि पुष्टि गर्नुहोस्।",
   tabMissing: "ध्यान आवश्यक",
   tabFound: "उद्धार / सुरक्षित",
   statusMissing: "हराएको",

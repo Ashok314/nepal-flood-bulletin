@@ -176,11 +176,26 @@ export default function PersonCard({
           </div>
         )}
 
-        {person.reportedAt && (
-          <p className="mt-2 flex items-center gap-1 text-[11px] text-slate-400">
-            🕘 {m.reportedLabel} {timeAgo(person.reportedAt, lang)}
-          </p>
-        )}
+        <div className="mt-2 flex flex-wrap items-center justify-between gap-x-2 gap-y-1 text-[11px] text-slate-400">
+          {person.reportedAt && (
+            <span className="flex items-center gap-1">
+              🕘 {m.reportedLabel} {timeAgo(person.reportedAt, lang)}
+            </span>
+          )}
+          {person.source && (
+            <span className="flex items-center gap-1">
+              {m.source}:{" "}
+              <a
+                href={person.source.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-medium text-brand hover:underline"
+              >
+                {person.source.label} ↗
+              </a>
+            </span>
+          )}
+        </div>
       </div>
     </div>
   );
