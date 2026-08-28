@@ -7,8 +7,6 @@ import { telHref } from "@/lib/format";
 
 const NAV = [
   { href: "#search-rescue", key: "srTitle" as const },
-  { href: "#rivers", key: "riverTitle" as const },
-  { href: "#updates", key: "updatesTitle" as const },
   { href: "#help", key: "emergencyRelief" as const },
   { href: "#donate", key: "donationTitle" as const },
 ];
