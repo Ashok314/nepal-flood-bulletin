@@ -160,34 +160,73 @@ export function parseBulletin(html: string): Person[] {
   return people;
 }
 
-// ---- fetch + cache ---------------------------------------------------------
+// ---- hospital facility totals (HEOC-style table inside #treat) -------------
 
-let cache: { people: Person[]; at: number } | null = null;
-let inflight: Promise<Person[]> | null = null;
+export type HospitalStat = {
+  name: string;
+  total: string;
+  discharged: string;
+  referred: string;
+  isTotal: boolean;
+};
 
-async function fetchAndParse(): Promise<Person[]> {
+export function parseHospitalStats(html: string): HospitalStat[] {
+  const rows = tableRows(sliceSection(html, "treat"));
+  return rows
+    .filter(
+      (c) =>
+        c.length === 4 &&
+        c[0] &&
+        !isNum(c[0]) &&
+        !/अस्पताल|सि\.नं/.test(c[0]) && // skip the header row
+        /[\d०-९]/.test(c[1]), // has a numeric total
+    )
+    .map((c) => ({
+      name: c[0],
+      total: toLatin(c[1]),
+      discharged: toLatin(c[2] || ""),
+      referred: toLatin(c[3] || ""),
+      isTotal: /जम्मा|कुल|total/i.test(c[0]),
+    }));
+}
+
+// ---- fetch + cache (HTML fetched once, both views derived from it) ----------
+
+let htmlCache: { html: string; at: number } | null = null;
+let inflight: Promise<string> | null = null;
+
+async function fetchHtml(): Promise<string> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
   try {
     const res = await fetch(HTML_URL, { signal: controller.signal, cache: "no-store" });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const html = await res.text();
-    const people = parseBulletin(html);
-    if (people.length) cache = { people, at: Date.now() };
-    return people;
+    if (html.length) htmlCache = { html, at: Date.now() };
+    return html;
   } finally {
     clearTimeout(timer);
   }
 }
 
-export async function getBulletinRescued(): Promise<Person[]> {
-  if (cache && Date.now() - cache.at < TTL_MS) return cache.people;
+async function getHtml(): Promise<string> {
+  if (htmlCache && Date.now() - htmlCache.at < TTL_MS) return htmlCache.html;
   if (!inflight) {
-    inflight = fetchAndParse()
-      .catch(() => cache?.people ?? []) // serve stale snapshot, else empty
+    inflight = fetchHtml()
+      .catch(() => htmlCache?.html ?? "") // serve stale snapshot, else empty
       .finally(() => {
         inflight = null;
       });
   }
   return inflight;
+}
+
+export async function getBulletinRescued(): Promise<Person[]> {
+  const html = await getHtml();
+  return html ? parseBulletin(html) : [];
+}
+
+export async function getHospitalStats(): Promise<HospitalStat[]> {
+  const html = await getHtml();
+  return html ? parseHospitalStats(html) : [];
 }

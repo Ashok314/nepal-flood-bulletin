@@ -47,9 +47,15 @@ export const BUILDERS: { handle: string; url: string }[] = [
 
 // Government / official data sources we gather from (credited in the footer).
 export const DATA_SOURCES: { label: string; url: string }[] = [
+  { label: "NDRRMA SETU — Rescued & Missing Persons", url: "https://setu.ndrrma.gov.np/admin/recordlist.php" },
   { label: "NDRRMA", url: "https://ndrrma.gov.np/" },
-  { label: "DHM (Hydrology & Meteorology)", url: "https://www.dhm.gov.np/" },
+  { label: "Nepal Police — Unidentified Bodies", url: "https://udb.nepalpolice.gov.np/dead-bodies" },
+  { label: "HEOC — Health Emergency Operation Center (MoHP)", url: "https://heoc.mohp.gov.np/" },
+  { label: "OPMCM — Rescue / Lost & Found Portal", url: "https://rescue.opmcm.gov.np/person-lost-found" },
   { label: "DAO Rasuwa", url: "https://daorasuwa.moha.gov.np/" },
+  { label: "MoFA — Emergency Control Room (foreign nationals)", url: "https://www.mofa.gov.np/" },
+  { label: "DHM — Hydrology & Meteorology", url: "https://www.dhm.gov.np/" },
+  { label: "Rasuwa Flood Bulletin — Niraj Bhusal (individual maintained)", url: "https://nirajbhusal.github.io/rasuwa-flood-bulletin/" },
 ];
 
 export type Hotline = {

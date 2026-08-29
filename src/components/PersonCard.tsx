@@ -92,14 +92,23 @@ export default function PersonCard({
 }) {
   const phones = splitPhones(person.phone);
   const isFound = person.status === "found";
+  const isDeceased = person.status === "deceased";
   const tags = personTags(person);
   return (
     <div
       className={`overflow-hidden rounded-xl border bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ${
-        isFound ? "border-emerald-200" : "border-slate-200"
+        isDeceased
+          ? "border-slate-300"
+          : isFound
+            ? "border-emerald-200"
+            : "border-slate-200"
       }`}
     >
-      <div className={`h-1 w-full ${isFound ? "bg-emerald-400" : "bg-rose-400"}`} />
+      <div
+        className={`h-1 w-full ${
+          isDeceased ? "bg-slate-400" : isFound ? "bg-emerald-400" : "bg-rose-400"
+        }`}
+      />
       <div className="p-4">
         <div className="mb-2.5 flex items-start justify-between gap-2">
           <div className="flex min-w-0 items-start gap-2.5">
@@ -137,15 +146,19 @@ export default function PersonCard({
             )}
             <span
               className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold ${
-                isFound ? "bg-emerald-100 text-emerald-800" : "bg-rose-100 text-rose-800"
+                isDeceased
+                  ? "bg-slate-200 text-slate-700"
+                  : isFound
+                    ? "bg-emerald-100 text-emerald-800"
+                    : "bg-rose-100 text-rose-800"
               }`}
             >
               <span
                 className={`h-1.5 w-1.5 rounded-full ${
-                  isFound ? "bg-emerald-500" : "bg-rose-500"
+                  isDeceased ? "bg-slate-500" : isFound ? "bg-emerald-500" : "bg-rose-500"
                 }`}
               />
-              {isFound ? m.statusRescued : m.statusMissing}
+              {isDeceased ? m.statusDeceased : isFound ? m.statusRescued : m.statusMissing}
             </span>
           </div>
         </div>

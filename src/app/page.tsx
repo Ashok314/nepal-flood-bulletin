@@ -2,7 +2,9 @@ import { getFeed } from "@/lib/feed";
 import { getRivers } from "@/lib/rivers";
 import { getRecentUpdates } from "@/lib/updates";
 import { getNdrrmaRescued } from "@/lib/ndrrma";
-import { getBulletinRescued } from "@/lib/bulletin";
+import { getBulletinRescued, getHospitalStats } from "@/lib/bulletin";
+import { getSetuPeople } from "@/lib/setu";
+import { getPoliceBodies } from "@/lib/police";
 import { getDaoRescued } from "@/lib/dao";
 import { romanKey } from "@/lib/translit";
 import type { Person } from "@/lib/feed";
@@ -15,6 +17,7 @@ import LiveUpdatesPanel from "@/components/LiveUpdatesPanel";
 // import RiverWatch from "@/components/RiverWatch"; // paused: focusing on people
 import SearchRescue from "@/components/SearchRescue";
 import HelpSection from "@/components/HelpSection";
+import HospitalSection from "@/components/HospitalSection";
 import DonationSection from "@/components/DonationSection";
 import Footer from "@/components/Footer";
 
@@ -28,19 +31,25 @@ export default async function Page({
   const lang: Lang = isLang(searchParams.lang) ? searchParams.lang : "en";
   const m = getMessages(lang);
 
-  const [feed, rivers, updates, ndrrma, bulletin] = await Promise.all([
+  const [feed, rivers, updates, ndrrma, bulletin, setu, police] = await Promise.all([
     getFeed(),
     getRivers(), // still used for the situation KPI (rivers above warning)
     getRecentUpdates(),
     getNdrrmaRescued(),
     getBulletinRescued(), // 8 official rescue lists parsed from the bulletin
+    getSetuPeople(), // official NDRRMA SETU person-level registry (missing + found)
+    getPoliceBodies(), // Nepal Police unidentified recovered bodies
   ]);
 
-  // Merge every rescued source into one searchable list, each card keeping its
-  // own source + deep-link. Deduped by romanized name + age so a person listed
-  // in several places shows once. Priority (first kept): live NDRRMA API, then
-  // the bulletin's rescue lists, community-confirmed, then the DAO snapshot.
-  const dedupeFound = (lists: Person[][]): Person[] => {
+  const hospitalStats = await getHospitalStats(); // reuses the cached bulletin HTML
+
+  const setuFound = setu.filter((p) => p.status === "found");
+  const setuMissing = setu.filter((p) => p.status === "missing");
+
+  // Merge each source into one searchable list, every card keeping its own
+  // source + deep-link. Deduped by romanized name + age so a person listed in
+  // several places shows once (first occurrence wins — official sources first).
+  const dedupePeople = (lists: Person[][]): Person[] => {
     const seen = new Set<string>();
     const out: Person[] = [];
     for (const list of lists) {
@@ -54,11 +63,14 @@ export default async function Page({
     return out;
   };
 
-  const found = dedupeFound([ndrrma, bulletin, feed.found, getDaoRescued()]);
+  const found = dedupePeople([ndrrma, bulletin, setuFound, feed.found, getDaoRescued()]);
+  const missing = dedupePeople([setuMissing, feed.missing]);
+  const deceased = police; // unidentified recovered bodies — never name-deduped
   const merged = {
     ...feed,
+    missing,
     found,
-    counts: { ...feed.counts, found: found.length },
+    counts: { missing: missing.length, found: found.length },
   };
 
   const kpis = deriveKpis(merged, rivers);
@@ -115,6 +127,7 @@ export default async function Page({
               lang={lang}
               missing={merged.missing}
               found={merged.found}
+              deceased={deceased}
               forms={merged.forms}
             />
           </div>
@@ -122,6 +135,8 @@ export default async function Page({
 
         {/* River Watch paused to keep focus on people search
         <RiverWatch lang={lang} m={m} rivers={rivers} /> */}
+
+        <HospitalSection lang={lang} m={m} stats={hospitalStats} />
 
         <HelpSection lang={lang} m={m} forms={feed.forms} />
 

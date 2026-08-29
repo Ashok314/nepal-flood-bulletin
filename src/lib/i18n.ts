@@ -134,7 +134,7 @@ const en = {
   riverSafetyBody: "Move from the riverside to higher ground and stay on high alert.",
 
   footerDisclaimer:
-    "For awareness and information only. This is an unofficial community mirror, not a rescue authority. Information may be incomplete or out of date; verify critical details independently before acting. Not affiliated with any government body.",
+    "This site gathers missing, rescued and recovered-person records from official sources — NDRRMA SETU, NDRRMA, Nepal Police, HEOC, OPMCM and more — alongside the community bulletin, so families can search them in one place. Records may be updated at their source after they appear here, and some matches are fuzzy or transliterated — so please re-confirm details, especially a person's identity, with the official source or authorities before acting. We help you search; we are not the rescuing authority.",
   dataMirroredFrom: "Data mirrored from",
   backToTop: "Back to top",
 
@@ -170,6 +170,26 @@ const en = {
   statMissing: "missing",
   statFound: "found",
   statTracked: "records tracked",
+
+  // Categories & search cautions
+  tabDeceased: "Unidentified",
+  statusDeceased: "Unidentified body",
+  deceasedNote:
+    "Recovered but not-yet-identified victims (Nepal Police). Listed so families can reconcile — contact the holding facility or police to confirm.",
+  fuzzyNote:
+    "Some results are close or similar-sounding matches — names vary by spelling and script, so a match may be a different person. Please verify identity before concluding.",
+
+  // Hospitals
+  hospitalsTitle: "Hospitals & treatment",
+  hospitalsIntro:
+    "Where flood patients were taken for treatment, with admitted / discharged / referred counts. Named hospital patients are searchable above.",
+  hospitalName: "Facility",
+  hospitalTotal: "Admitted",
+  hospitalDischarged: "Discharged",
+  hospitalReferred: "Referred",
+  hospitalTotalRow: "Total",
+  hospitalsNote:
+    "Facility totals via the community bulletin (HEOC / DEOC-derived) — re-confirm with the hospital or health authorities.",
 };
 
 const ne: typeof en = {
@@ -299,7 +319,7 @@ const ne: typeof en = {
   riverSafetyBody: "नदी किनारबाट अग्लो सुरक्षित स्थानमा जानुहोस् र उच्च सतर्क रहनुहोस्।",
 
   footerDisclaimer:
-    "जनचेतना र जानकारीका लागि मात्र। यो अनौपचारिक सामुदायिक मिरर हो, उद्धार निकाय होइन। जानकारी अपूर्ण वा पुरानो हुन सक्छ; कार्य गर्नुअघि महत्त्वपूर्ण विवरण स्वतन्त्र रूपमा पुष्टि गर्नुहोस्। कुनै सरकारी निकायसँग सम्बद्ध छैन।",
+    "यो साइटले हराएका, उद्धार गरिएका र भेटिएका व्यक्तिका विवरण आधिकारिक स्रोतहरू — NDRRMA SETU, NDRRMA, नेपाल प्रहरी, HEOC, OPMCM लगायत — तथा सामुदायिक बुलेटिनबाट एकै ठाउँमा खोज्न मिल्ने गरी जुटाउँछ। यहाँ देखिएपछि पनि स्रोतमा विवरण अद्यावधिक हुन सक्छ, र केही मिलान मिल्दोजुल्दो वा लिप्यन्तरणमा आधारित हुन सक्छ — त्यसैले कार्य गर्नुअघि विवरण, विशेषगरी व्यक्तिको पहिचान, आधिकारिक स्रोत वा अधिकारीसँग पुनः पुष्टि गर्नुहोस्। हामी खोज्न सहयोग गर्छौं; हामी उद्धार गर्ने निकाय होइनौं।",
   dataMirroredFrom: "तथ्याङ्क स्रोत",
   backToTop: "माथि जानुहोस्",
 
@@ -334,6 +354,26 @@ const ne: typeof en = {
   statMissing: "हराएका",
   statFound: "भेटिएका",
   statTracked: "कुल विवरण",
+
+  // Categories & search cautions
+  tabDeceased: "अपरिचित शव",
+  statusDeceased: "अपरिचित शव",
+  deceasedNote:
+    "उद्धार गरिएका तर पहिचान नखुलेका शव (नेपाल प्रहरी)। परिवारले मिलान गर्न सकुन् भन्ने हेतुले राखिएको — पुष्टिका लागि सम्बन्धित अस्पताल/प्रहरीलाई सम्पर्क गर्नुहोस्।",
+  fuzzyNote:
+    "केही नतिजा मिल्दोजुल्दो वा उस्तै उच्चारणका हुन सक्छन् — नाम हिज्जे र लिपिअनुसार फरक पर्ने हुँदा फरक व्यक्ति पनि हुन सक्छ। निष्कर्षअघि पहिचान पुष्टि गर्नुहोस्।",
+
+  // Hospitals
+  hospitalsTitle: "अस्पताल तथा उपचार",
+  hospitalsIntro:
+    "बाढी प्रभावितहरूलाई उपचारका लागि पुर्‍याइएका अस्पताल — भर्ना / डिस्चार्ज / रिफर सङ्ख्यासहित। नाम भएका बिरामी माथि खोज्न सकिन्छ।",
+  hospitalName: "अस्पताल",
+  hospitalTotal: "भर्ना",
+  hospitalDischarged: "डिस्चार्ज",
+  hospitalReferred: "रिफर",
+  hospitalTotalRow: "जम्मा",
+  hospitalsNote:
+    "अस्पताल विवरण सामुदायिक बुलेटिन (HEOC / DEOC आधारित) बाट — अस्पताल वा स्वास्थ्य निकायसँग पुनः पुष्टि गर्नुहोस्।",
 };
 
 export const messages = { en, ne } as const;

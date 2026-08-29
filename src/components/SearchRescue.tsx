@@ -7,7 +7,7 @@ import { romanKey } from "@/lib/translit";
 import { useSearchQuery } from "@/lib/searchStore";
 import PersonCard from "./PersonCard";
 
-type Tab = "all" | "missing" | "found";
+type Tab = "all" | "missing" | "found" | "deceased";
 
 const PAGE_SIZE = 24;
 
@@ -16,12 +16,14 @@ export default function SearchRescue({
   lang,
   missing,
   found,
+  deceased = [],
   forms,
 }: {
   m: Messages;
   lang: Lang;
   missing: Person[];
   found: Person[];
+  deceased?: Person[];
   forms: { missing: string | null; found: string | null };
 }) {
   const [tab, setTab] = useState<Tab>("all");
@@ -36,7 +38,9 @@ export default function SearchRescue({
       ? missing
       : tab === "found"
         ? found
-        : [...missing, ...found];
+        : tab === "deceased"
+          ? deceased
+          : [...missing, ...found, ...deceased];
 
   // Precompute a plain blob + a romanized phonetic key per person, so Devanagari
   // names are searchable by romanized text (e.g. "binod" finds बिनोद).
@@ -75,22 +79,27 @@ export default function SearchRescue({
     return [...counts.entries()].sort((a, b) => b[1] - a[1]);
   }, [list]);
 
-  const filtered = useMemo(() => {
+  // Rank results: exact text matches first, then fuzzy / transliteration
+  // (romanized) matches. Both are shown so a spelling/script difference never
+  // hides someone — but the fuzzy ones are surfaced with a caution.
+  const { results, fuzzyCount } = useMemo(() => {
     const raw = q.trim();
-    const plainQ = raw.toLowerCase();
-    const qWords = raw ? romanKey(raw).split(" ").filter(Boolean) : [];
-    return indexed
+    const base = indexed
       .filter((a) => country === "all" || a.p.country === country)
       .filter(
         (a) => rescueStatus === "all" || a.p.rescueStatus === rescueStatus,
-      )
-      .filter(
-        (a) =>
-          !raw ||
-          a.plain.includes(plainQ) ||
-          (qWords.length > 0 && qWords.every((w) => a.key.includes(w))),
-      )
-      .map((a) => a.p);
+      );
+    if (!raw) return { results: base.map((a) => a.p), fuzzyCount: 0 };
+    const plainQ = raw.toLowerCase();
+    const qWords = romanKey(raw).split(" ").filter(Boolean);
+    const exact: Person[] = [];
+    const fuzzy: Person[] = [];
+    for (const a of base) {
+      if (a.plain.includes(plainQ)) exact.push(a.p);
+      else if (qWords.length > 0 && qWords.every((w) => a.key.includes(w)))
+        fuzzy.push(a.p);
+    }
+    return { results: [...exact, ...fuzzy], fuzzyCount: fuzzy.length };
   }, [q, country, rescueStatus, indexed]);
 
   // Reset page on any filter change; reset filters when switching tabs.
@@ -117,11 +126,11 @@ export default function SearchRescue({
     return c === "Nepal" ? m.countryNepal : c === "Foreign" ? m.countryForeign : c;
   }
 
-  const total = filtered.length;
+  const total = results.length;
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
   const current = Math.min(page, totalPages);
   const start = (current - 1) * PAGE_SIZE;
-  const pageItems = filtered.slice(start, start + PAGE_SIZE);
+  const pageItems = results.slice(start, start + PAGE_SIZE);
 
   function goTo(p: number) {
     setPage(p);
@@ -149,6 +158,15 @@ export default function SearchRescue({
             {m.tabFound}
             <Count active={tab === "found"} n={found.length} tone="emerald" />
           </TabButton>
+          {deceased.length > 0 && (
+            <TabButton
+              active={tab === "deceased"}
+              onClick={() => setTab("deceased")}
+            >
+              {m.tabDeceased}
+              <Count active={tab === "deceased"} n={deceased.length} tone="slate" />
+            </TabButton>
+          )}
         </div>
 
         <div className="ml-auto flex flex-wrap gap-2">
@@ -257,6 +275,18 @@ export default function SearchRescue({
             </div>
           )}
         </div>
+      )}
+
+      {tab === "deceased" && (
+        <p className="mb-3 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-600">
+          {m.deceasedNote}
+        </p>
+      )}
+
+      {q.trim() !== "" && fuzzyCount > 0 && (
+        <p className="mb-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
+          {m.fuzzyNote}
+        </p>
       )}
 
       {/* Result summary */}

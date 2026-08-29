@@ -1,5 +1,5 @@
 import type { Lang, Messages } from "@/lib/i18n";
-import { SITE, DATA_SOURCES, BUILDERS } from "@/lib/config";
+import { DATA_SOURCES, BUILDERS } from "@/lib/config";
 import { formatDateTime } from "@/lib/format";
 
 export default function Footer({
@@ -16,35 +16,8 @@ export default function Footer({
       <div className="mx-auto max-w-6xl px-4 py-8 text-sm text-slate-500">
         <p className="max-w-3xl">{m.footerDisclaimer}</p>
 
-        <p className="mt-4">
-          {m.creditBy}{" "}
-          <a
-            href={SITE.attribution.authorUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="font-semibold text-slate-700 underline hover:text-brand"
-          >
-            {SITE.attribution.author}
-          </a>{" "}
-          · {m.dataMirroredFrom}{" "}
-          <a
-            href={SITE.attribution.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="font-medium text-slate-700 underline hover:text-brand"
-          >
-            {SITE.attribution.label}
-          </a>
-          {fetchedAt && (
-            <span className="text-slate-400">
-              {" "}
-              · {m.updatedAt}: {formatDateTime(fetchedAt, lang)}
-            </span>
-          )}
-        </p>
-
         {DATA_SOURCES.length > 0 && (
-          <p className="mt-2 text-slate-500">
+          <p className="mt-4 text-slate-500">
             {m.dataSourcesLabel}:{" "}
             {DATA_SOURCES.map((s, i) => (
               <span key={s.url}>
@@ -59,6 +32,12 @@ export default function Footer({
                 </a>
               </span>
             ))}
+          </p>
+        )}
+
+        {fetchedAt && (
+          <p className="mt-2 text-slate-400">
+            {m.updatedAt}: {formatDateTime(fetchedAt, lang)}
           </p>
         )}
 

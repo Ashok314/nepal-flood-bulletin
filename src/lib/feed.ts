@@ -46,7 +46,7 @@ export type RawEntry = z.infer<typeof EntrySchema>;
 
 // ---------- Normalized types used by the UI ----------
 
-export type PersonStatus = "missing" | "found";
+export type PersonStatus = "missing" | "found" | "deceased";
 
 export type Person = {
   id: string;
