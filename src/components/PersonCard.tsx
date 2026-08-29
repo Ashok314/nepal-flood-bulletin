@@ -163,6 +163,12 @@ export default function PersonCard({
           </div>
         </div>
 
+        {person.possiblyRescued && (
+          <div className="mb-2.5 rounded-md bg-emerald-50 px-2.5 py-1.5 text-xs font-semibold text-emerald-800 ring-1 ring-emerald-100">
+            ⚑ {m.possiblyRescuedNote}
+          </div>
+        )}
+
         <div className="space-y-1.5">
           {person.place && <Row icon={<PinIcon />}>{person.place}</Row>}
           {person.age && (

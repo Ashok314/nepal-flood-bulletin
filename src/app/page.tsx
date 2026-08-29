@@ -18,6 +18,7 @@ import LiveUpdatesPanel from "@/components/LiveUpdatesPanel";
 import SearchRescue from "@/components/SearchRescue";
 import HelpSection from "@/components/HelpSection";
 import HospitalSection from "@/components/HospitalSection";
+import KailashAlert from "@/components/KailashAlert";
 import DonationSection from "@/components/DonationSection";
 import Footer from "@/components/Footer";
 
@@ -64,7 +65,20 @@ export default async function Page({
   };
 
   const found = dedupePeople([ndrrma, bulletin, setuFound, feed.found, getDaoRescued()]);
-  const missing = dedupePeople([setuMissing, feed.missing]);
+  const missingRaw = dedupePeople([setuMissing, feed.missing]);
+
+  // Flag anyone in the missing list who also appears in the rescued list with
+  // the same name + age — they may already be safe. Soft hint ("may…, check"),
+  // so a coincidental same-name match just prompts a double-check.
+  const foundKeys = new Set(
+    found.filter((p) => p.age).map((p) => `${romanKey(p.name)}|${p.age}`),
+  );
+  const missing = missingRaw.map((p) =>
+    p.age && foundKeys.has(`${romanKey(p.name)}|${p.age}`)
+      ? { ...p, possiblyRescued: true }
+      : p,
+  );
+
   const deceased = police; // unidentified recovered bodies — never name-deduped
   const merged = {
     ...feed,
@@ -109,6 +123,8 @@ export default async function Page({
         counts={merged.counts}
         forms={merged.forms}
       />
+
+      <KailashAlert lang={lang} m={m} />
 
       <KpiHeader lang={lang} m={m} kpis={kpis} />
 

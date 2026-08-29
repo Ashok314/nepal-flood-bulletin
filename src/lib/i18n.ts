@@ -190,6 +190,18 @@ const en = {
   hospitalTotalRow: "Total",
   hospitalsNote:
     "Facility totals via the community bulletin (HEOC / DEOC-derived) — re-confirm with the hospital or health authorities.",
+
+  // Kailash Mansarovar Yatra pilgrims notice
+  kailashTag: "Special notice",
+  kailashTitle: "Kailash Mansarovar Yatra pilgrims — out of contact",
+  kailashBody:
+    "When the flood hit the Rasuwagadhi–Kerung (Gyirong) border crossing on 26 August 2026, foreign pilgrims on the Kailash Mansarovar Yatra were caught in the affected zone. Among those still out of contact are the Isha Foundation's “S3” group (reported ~77–80 members) and a 32-member group from Kolkata. Communication lines, roads and power were destroyed, so contact has not been restored. We do not yet hold person-level records for this group — families should reach the official channels below.",
+  kailashContactsLabel: "Official contacts for families",
+  kailashEmbassy: "Indian Embassy, Kathmandu — emergency",
+  kailashMofaLabel: "Nepal MoFA — Emergency Control Room",
+  kailashNewsLabel: "In the news",
+  kailashChip: "Kailash Yatra pilgrims",
+  possiblyRescuedNote: "May already be rescued — check the Rescued list",
 };
 
 const ne: typeof en = {
@@ -374,6 +386,18 @@ const ne: typeof en = {
   hospitalTotalRow: "जम्मा",
   hospitalsNote:
     "अस्पताल विवरण सामुदायिक बुलेटिन (HEOC / DEOC आधारित) बाट — अस्पताल वा स्वास्थ्य निकायसँग पुनः पुष्टि गर्नुहोस्।",
+
+  // Kailash Mansarovar Yatra pilgrims notice
+  kailashTag: "विशेष सूचना",
+  kailashTitle: "कैलाश मानसरोवर यात्रा तीर्थयात्रीहरू — सम्पर्कविहीन",
+  kailashBody:
+    "२६ अगस्ट २०२६ मा रसुवागढी–केरुङ (ग्यिरोङ) नाकामा बाढी आउँदा कैलाश मानसरोवर यात्रामा रहेका विदेशी तीर्थयात्रीहरू प्रभावित क्षेत्रमा परे। हालसम्म सम्पर्कविहीन रहेकाहरूमा ईशा फाउन्डेसनको “S3” समूह (करिब ७७–८० जना) र कोलकाताको ३२ सदस्यीय समूह छन्। सञ्चार, सडक र विद्युत् नष्ट भएकाले सम्पर्क पुनः स्थापित हुन सकेको छैन। यस समूहको व्यक्तिगत विवरण हामीसँग छैन — परिवारजनले तलका आधिकारिक माध्यमहरूमा सम्पर्क गर्नुहोस्।",
+  kailashContactsLabel: "परिवारका लागि आधिकारिक सम्पर्क",
+  kailashEmbassy: "भारतीय दूतावास, काठमाडौं — आपत्‌कालीन",
+  kailashMofaLabel: "नेपाल परराष्ट्र मन्त्रालय — आपत्‌कालीन कक्ष",
+  kailashNewsLabel: "समाचारमा",
+  kailashChip: "कैलाश यात्रा तीर्थयात्री",
+  possiblyRescuedNote: "उद्धार भइसकेको हुन सक्छ — उद्धार सूची जाँच्नुहोस्",
 };
 
 export const messages = { en, ne } as const;

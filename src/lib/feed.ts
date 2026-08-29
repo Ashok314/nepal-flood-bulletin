@@ -64,6 +64,7 @@ export type Person = {
   rescueStatus?: string; // NDRRMA status: Safe / Injured / Under Medical Care / …
   status: PersonStatus;
   flagged?: boolean;
+  possiblyRescued?: boolean; // listed as missing but also appears in the rescued list
 };
 
 export type NormalizedFeed = {
