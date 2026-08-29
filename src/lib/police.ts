@@ -92,6 +92,10 @@ async function fetchAll(): Promise<Person[]> {
 
 export async function getPoliceBodies(): Promise<Person[]> {
   if (cache && Date.now() - cache.at < TTL_MS) return cache.people;
+  // Non-blocking: the police server is slow/unreliable to reach and would
+  // otherwise stall every cold render for the full timeout. Kick off a refresh
+  // in the background and return immediately with whatever we already have; the
+  // fresh data lands on a later request.
   if (!inflight) {
     inflight = fetchAll()
       .catch(() => cache?.people ?? [])
@@ -99,5 +103,5 @@ export async function getPoliceBodies(): Promise<Person[]> {
         inflight = null;
       });
   }
-  return inflight;
+  return cache?.people ?? [];
 }
