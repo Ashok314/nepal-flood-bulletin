@@ -6,6 +6,7 @@ import { getBulletinRescued, getHospitalStats } from "@/lib/bulletin";
 import { getSetuPeople } from "@/lib/setu";
 import { getPoliceBodies } from "@/lib/police";
 import { getDaoRescued } from "@/lib/dao";
+import { getTweetRescued } from "@/lib/tweetRescued";
 import { romanKey } from "@/lib/translit";
 import type { Person } from "@/lib/feed";
 import { deriveKpis } from "@/lib/metrics";
@@ -64,7 +65,14 @@ export default async function Page({
     return out;
   };
 
-  const found = dedupePeople([ndrrma, bulletin, setuFound, feed.found, getDaoRescued()]);
+  const found = dedupePeople([
+    ndrrma,
+    bulletin,
+    setuFound,
+    getTweetRescued(), // NDRRMA official list (2083.05.13), sourced to their tweet
+    feed.found,
+    getDaoRescued(),
+  ]);
   const missingRaw = dedupePeople([setuMissing, feed.missing]);
 
   // Flag anyone in the missing list who also appears in the rescued list with
