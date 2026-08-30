@@ -132,6 +132,11 @@ authority and is not affiliated with any government body. Information may be
 incomplete, out of date, or fuzzy-matched — verify critical details, especially
 a person's identity, with the official source or authorities before acting.
 
+## License
+
+[MIT](LICENSE) © 2026 Yash Paudel and contributors. Contributions are welcome
+under the same license.
+
 ---
 
 Built by [@yash_paudel](https://x.com/yash_paudel) & [@sanzinme](https://x.com/sanzinme).
