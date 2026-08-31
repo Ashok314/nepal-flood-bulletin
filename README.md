@@ -47,8 +47,7 @@ merged and de-duplicated across sources by romanized name + age:
 
 | Source | What it provides |
 | --- | --- |
-| **NDRRMA SETU** (`setu.ndrrma.gov.np`) | Official person-level missing / found / rescued registry |
-| **NDRRMA API** (`ndrrma.gov.np`) | Rescued-persons list |
+| **NDRRMA API** (`ndrrma.gov.np`) | Official rescued-persons list (paginated) |
 | **Nepal Police** (`udb.nepalpolice.gov.np`) | Unidentified recovered bodies |
 | **HEOC** (`heoc.mohp.gov.np`) | Hospital facility totals |
 | **OPMCM** rescue portal | Lost & found reports |
@@ -72,9 +71,8 @@ Rough map:
 src/
   app/page.tsx          # fetch all sources → merge → dedupe → render
   lib/
-    setu.ts             # NDRRMA SETU registry (paginated HTML)
-    ndrrma.ts           # NDRRMA rescued-persons API
-    bulletin.ts         # Niraj's bulletin (8+ embedded lists) + hospital totals
+    ndrrma.ts           # NDRRMA rescued-persons API (paginated)
+    bulletin.ts         # Niraj's bulletin (embedded lists, when present) + hospital totals
     police.ts           # Nepal Police unidentified bodies
     tweetRescued.ts     # hand-transcribed official snapshots
     feed.ts             # community feed + the shared Person type

@@ -47,8 +47,7 @@ export const BUILDERS: { handle: string; url: string }[] = [
 
 // Government / official data sources we gather from (credited in the footer).
 export const DATA_SOURCES: { label: string; url: string }[] = [
-  { label: "NDRRMA SETU — Rescued & Missing Persons", url: "https://setu.ndrrma.gov.np/admin/recordlist.php" },
-  { label: "NDRRMA", url: "https://ndrrma.gov.np/" },
+  { label: "NDRRMA — Rescued Persons", url: "https://ndrrma.gov.np/" },
   { label: "Nepal Police — Unidentified Bodies", url: "https://udb.nepalpolice.gov.np/dead-bodies" },
   { label: "HEOC — Health Emergency Operation Center (MoHP)", url: "https://heoc.mohp.gov.np/" },
   { label: "OPMCM — Rescue / Lost & Found Portal", url: "https://rescue.opmcm.gov.np/person-lost-found" },

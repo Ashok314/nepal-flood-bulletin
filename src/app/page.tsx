@@ -3,7 +3,6 @@ import { getRivers } from "@/lib/rivers";
 import { getRecentUpdates } from "@/lib/updates";
 import { getNdrrmaRescued } from "@/lib/ndrrma";
 import { getBulletinRescued, getHospitalStats } from "@/lib/bulletin";
-import { getSetuPeople } from "@/lib/setu";
 import { getPoliceBodies } from "@/lib/police";
 import { getDaoRescued } from "@/lib/dao";
 import { getTweetRescued } from "@/lib/tweetRescued";
@@ -33,20 +32,16 @@ export default async function Page({
   const lang: Lang = isLang(searchParams.lang) ? searchParams.lang : "en";
   const m = getMessages(lang);
 
-  const [feed, rivers, updates, ndrrma, bulletin, setu, police] = await Promise.all([
+  const [feed, rivers, updates, ndrrma, bulletin, police] = await Promise.all([
     getFeed(),
     getRivers(), // still used for the situation KPI (rivers above warning)
     getRecentUpdates(),
     getNdrrmaRescued(),
-    getBulletinRescued(), // 8 official rescue lists parsed from the bulletin
-    getSetuPeople(), // official NDRRMA SETU person-level registry (missing + found)
+    getBulletinRescued(), // official rescue lists parsed from the bulletin (when present)
     getPoliceBodies(), // Nepal Police unidentified recovered bodies
   ]);
 
   const hospitalStats = await getHospitalStats(); // reuses the cached bulletin HTML
-
-  const setuFound = setu.filter((p) => p.status === "found");
-  const setuMissing = setu.filter((p) => p.status === "missing");
 
   // Merge each source into one searchable list, every card keeping its own
   // source + deep-link. Deduped by romanized name + age so a person listed in
@@ -68,12 +63,11 @@ export default async function Page({
   const found = dedupePeople([
     ndrrma,
     bulletin,
-    setuFound,
     getTweetRescued(), // NDRRMA official list (2083.05.13), sourced to their tweet
     feed.found,
     getDaoRescued(),
   ]);
-  const missingRaw = dedupePeople([setuMissing, feed.missing]);
+  const missingRaw = dedupePeople([feed.missing]);
 
   // Flag anyone in the missing list who also appears in the rescued list with
   // the same name + age — they may already be safe. Soft hint ("may…, check"),
