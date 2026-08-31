@@ -1,7 +1,7 @@
+import type { ReactNode } from "react";
 import LanguageToggle from "./LanguageToggle";
 import NepalFlag from "./NepalFlag";
 import HeroSearch from "./HeroSearch";
-import RollingCount from "./RollingCount";
 import type { Lang, Messages } from "@/lib/i18n";
 import { formatDateTime } from "@/lib/format";
 
@@ -26,10 +26,9 @@ export default function Hero({
     sheetUrl: string | null;
     stale: boolean;
   };
-  counts: { missing: number; found: number };
+  counts: ReactNode; // streamed in via <Suspense>
   forms: { missing: string | null; found: string | null };
 }) {
-  const total = counts.missing + counts.found;
 
   return (
     <header>
@@ -141,21 +140,8 @@ export default function Hero({
             </a>
           </div>
 
-          {/* Counts */}
-          <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-white/80">
-            <span>
-              <RollingCount value={counts.missing} className="font-bold text-white" />{" "}
-              {m.statMissing}
-            </span>
-            <span>
-              <RollingCount value={counts.found} className="font-bold text-white" />{" "}
-              {m.statFound}
-            </span>
-            <span>
-              <RollingCount value={total} className="font-bold text-white" />{" "}
-              {m.statTracked}
-            </span>
-          </div>
+          {/* Counts — streamed in behind the shell */}
+          {counts}
         </div>
       </div>
     </header>

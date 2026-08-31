@@ -202,6 +202,8 @@ const en = {
   kailashNewsLabel: "In the news",
   kailashChip: "Kailash Yatra pilgrims",
   possiblyRescuedNote: "May already be rescued — check the Rescued list",
+  searchableHere: "searchable by name here",
+  resultsLoading: "Loading the people list…",
 };
 
 const ne: typeof en = {
@@ -398,6 +400,8 @@ const ne: typeof en = {
   kailashNewsLabel: "समाचारमा",
   kailashChip: "कैलाश यात्रा तीर्थयात्री",
   possiblyRescuedNote: "उद्धार भइसकेको हुन सक्छ — उद्धार सूची जाँच्नुहोस्",
+  searchableHere: "यहाँ नामबाट खोज्न मिल्ने",
+  resultsLoading: "व्यक्ति सूची लोड हुँदै…",
 };
 
 export const messages = { en, ne } as const;

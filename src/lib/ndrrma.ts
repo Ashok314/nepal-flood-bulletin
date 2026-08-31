@@ -174,3 +174,34 @@ export function getNdrrmaRescued(): Promise<Person[]> {
 export function getNdrrmaMissing(): Promise<Person[]> {
   return load(MISSING_URL, normalizeMissing, missingBox);
 }
+
+// Official aggregate totals — a tiny, always-valid call (the full list flakes,
+// this doesn't). NDRRMA's rescued total includes records with no published
+// name, so it runs ahead of what we can make searchable.
+const STATUS_COUNTS_URL = "https://ndrrma.gov.np/api/v1/rescues/status-counts/";
+let countsCache: { data: { rescued: number; missing: number }; at: number } | null =
+  null;
+
+export async function getNdrrmaCounts(): Promise<{ rescued: number; missing: number }> {
+  if (countsCache && Date.now() - countsCache.at < TTL_MS) return countsCache.data;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 8_000);
+  try {
+    const [sc, mp] = await Promise.all([
+      fetch(STATUS_COUNTS_URL, { signal: controller.signal, cache: "no-store" })
+        .then((r) => (r.ok ? r.json() : null))
+        .catch(() => null),
+      fetch(`${MISSING_URL}?limit=1`, { signal: controller.signal, cache: "no-store" })
+        .then((r) => (r.ok ? r.json() : null))
+        .catch(() => null),
+    ]);
+    const data = {
+      rescued: Number(sc?.total_count) || 0,
+      missing: Number(mp?.count) || 0,
+    };
+    if (data.rescued || data.missing) countsCache = { data, at: Date.now() };
+    return countsCache?.data ?? data;
+  } finally {
+    clearTimeout(timer);
+  }
+}

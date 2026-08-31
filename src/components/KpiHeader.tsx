@@ -35,11 +35,22 @@ function Stat({
 export default function KpiHeader({
   m,
   kpis,
+  official,
 }: {
   lang: Lang;
   m: Messages;
   kpis: Kpis;
+  official?: { rescued: number; missing: number };
 }) {
+  // NDRRMA's official rescued total runs ahead of what we can make searchable
+  // (some records have no published name). Show the official number, with the
+  // searchable count as context.
+  const rescuedOfficial = official?.rescued ?? 0;
+  const rescuedValue = Math.max(rescuedOfficial, kpis.rescued);
+  const rescuedSub =
+    rescuedOfficial > kpis.rescued
+      ? `${kpis.rescued.toLocaleString()} ${m.searchableHere}`
+      : undefined;
   const riverTone = kpis.rivers.anyDanger
     ? "red"
     : kpis.rivers.aboveWarning > 0
@@ -59,8 +70,13 @@ export default function KpiHeader({
           {kpis.missing > 0 && (
             <Stat value={kpis.missing.toLocaleString()} label={m.kpiStillMissing} tone="rose" />
           )}
-          {kpis.rescued > 0 && (
-            <Stat value={kpis.rescued.toLocaleString()} label={m.kpiRescued} tone="emerald" />
+          {rescuedValue > 0 && (
+            <Stat
+              value={rescuedValue.toLocaleString()}
+              label={m.kpiRescued}
+              tone="emerald"
+              sub={rescuedSub}
+            />
           )}
           {kpis.missing + kpis.rescued > 0 && (
             <Stat value={`${kpis.accountedPct}%`} label={m.kpiAccounted} tone="slate" />

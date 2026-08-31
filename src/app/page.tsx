@@ -1,20 +1,12 @@
+import { Suspense } from "react";
 import { getFeed } from "@/lib/feed";
-import { getRivers } from "@/lib/rivers";
-import { getRecentUpdates } from "@/lib/updates";
-import { getNdrrmaRescued, getNdrrmaMissing } from "@/lib/ndrrma";
-import { getBulletinRescued, getHospitalStats } from "@/lib/bulletin";
-import { getPoliceBodies } from "@/lib/police";
-import { getDaoRescued } from "@/lib/dao";
-import { getTweetRescued } from "@/lib/tweetRescued";
-import { romanKey } from "@/lib/translit";
-import type { Person } from "@/lib/feed";
-import { deriveKpis } from "@/lib/metrics";
-import { getMessages, isLang, type Lang } from "@/lib/i18n";
+import { getDirectory } from "@/lib/directory";
+import { getMessages, isLang, type Lang, type Messages } from "@/lib/i18n";
 import { BUILDERS } from "@/lib/config";
+import RollingCount from "@/components/RollingCount";
 import Hero from "@/components/Hero";
 import KpiHeader from "@/components/KpiHeader";
 import LiveUpdatesPanel from "@/components/LiveUpdatesPanel";
-// import RiverWatch from "@/components/RiverWatch"; // paused: focusing on people
 import SearchRescue from "@/components/SearchRescue";
 import HelpSection from "@/components/HelpSection";
 import HospitalSection from "@/components/HospitalSection";
@@ -34,67 +26,9 @@ export default async function Page({
 }) {
   const lang: Lang = isLang(searchParams.lang) ? searchParams.lang : "en";
   const m = getMessages(lang);
-
-  const [feed, rivers, updates, ndrrma, ndrrmaMissing, bulletin, police] =
-    await Promise.all([
-      getFeed(),
-      getRivers(), // still used for the situation KPI (rivers above warning)
-      getRecentUpdates(),
-      getNdrrmaRescued(),
-      getNdrrmaMissing(), // official NDRRMA missing-persons list
-      getBulletinRescued(), // official rescue lists parsed from the bulletin (when present)
-      getPoliceBodies(), // Nepal Police unidentified recovered bodies
-    ]);
-
-  const hospitalStats = await getHospitalStats(); // reuses the cached bulletin HTML
-
-  // Merge each source into one searchable list, every card keeping its own
-  // source + deep-link. Deduped by romanized name + age so a person listed in
-  // several places shows once (first occurrence wins — official sources first).
-  const dedupePeople = (lists: Person[][]): Person[] => {
-    const seen = new Set<string>();
-    const out: Person[] = [];
-    for (const list of lists) {
-      for (const p of list) {
-        const key = `${romanKey(p.name)}|${p.age || ""}`;
-        if (p.name && p.name !== "-" && seen.has(key)) continue;
-        seen.add(key);
-        out.push(p);
-      }
-    }
-    return out;
-  };
-
-  const found = dedupePeople([
-    ndrrma,
-    bulletin,
-    getTweetRescued(), // NDRRMA official list (2083.05.13), sourced to their tweet
-    feed.found,
-    getDaoRescued(),
-  ]);
-  const missingRaw = dedupePeople([ndrrmaMissing, feed.missing]);
-
-  // Flag anyone in the missing list who also appears in the rescued list with
-  // the same name + age — they may already be safe. Soft hint ("may…, check"),
-  // so a coincidental same-name match just prompts a double-check.
-  const foundKeys = new Set(
-    found.filter((p) => p.age).map((p) => `${romanKey(p.name)}|${p.age}`),
-  );
-  const missing = missingRaw.map((p) =>
-    p.age && foundKeys.has(`${romanKey(p.name)}|${p.age}`)
-      ? { ...p, possiblyRescued: true }
-      : p,
-  );
-
-  const deceased = police; // unidentified recovered bodies — never name-deduped
-  const merged = {
-    ...feed,
-    missing,
-    found,
-    counts: { missing: missing.length, found: found.length },
-  };
-
-  const kpis = deriveKpis(merged, rivers);
+  // The hero shell only needs the (fast) feed for its timestamp + report links,
+  // so it renders immediately; the counts + sections stream in behind it.
+  const feed = await getFeed();
 
   return (
     <div id="top">
@@ -127,46 +61,144 @@ export default async function Page({
           sheetUrl: feed.sheetUrl,
           stale: feed.stale,
         }}
-        counts={merged.counts}
-        forms={merged.forms}
+        forms={feed.forms}
+        counts={
+          <Suspense fallback={<HeroCountsSkeleton />}>
+            <HeroCounts m={m} />
+          </Suspense>
+        }
       />
 
       <KailashAlert lang={lang} m={m} />
 
-      <KpiHeader lang={lang} m={m} kpis={kpis} />
+      <Suspense fallback={<OverviewSkeleton m={m} />}>
+        <Overview lang={lang} m={m} />
+      </Suspense>
 
-      <LiveUpdatesPanel m={m} lang={lang} items={updates} />
+      <Suspense fallback={null}>
+        <LiveUpdates lang={lang} m={m} />
+      </Suspense>
 
       <main>
-        <section
-          id="search-rescue"
-          className="mx-auto max-w-6xl scroll-mt-16 px-4 py-10"
-        >
+        <section id="search-rescue" className="mx-auto max-w-6xl scroll-mt-16 px-4 py-10">
           <h2 className="text-2xl font-bold text-slate-900">{m.srTitle}</h2>
           <p className="mt-1 max-w-3xl text-sm text-slate-500">{m.srIntro}</p>
           <div className="mt-5">
-            <SearchRescue
-              m={m}
-              lang={lang}
-              missing={merged.missing}
-              found={merged.found}
-              deceased={deceased}
-              forms={merged.forms}
-            />
+            <Suspense fallback={<ResultsSkeleton m={m} />}>
+              <Results lang={lang} m={m} />
+            </Suspense>
           </div>
         </section>
 
-        {/* River Watch paused to keep focus on people search
-        <RiverWatch lang={lang} m={m} rivers={rivers} /> */}
-
-        <HospitalSection lang={lang} m={m} stats={hospitalStats} />
+        <Suspense fallback={null}>
+          <Hospitals lang={lang} m={m} />
+        </Suspense>
 
         <HelpSection lang={lang} m={m} forms={feed.forms} />
-
         <DonationSection lang={lang} m={m} />
       </main>
 
       <Footer lang={lang} m={m} fetchedAt={feed.fetchedAt} />
     </div>
   );
+}
+
+/* ---------- Streamed sections (each shares the cached getDirectory) ---------- */
+
+async function HeroCounts({ m }: { m: Messages }) {
+  const { merged } = await getDirectory();
+  const total = merged.counts.missing + merged.counts.found;
+  return (
+    <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-white/80">
+      <span>
+        <RollingCount value={merged.counts.missing} className="font-bold text-white" />{" "}
+        {m.statMissing}
+      </span>
+      <span>
+        <RollingCount value={merged.counts.found} className="font-bold text-white" />{" "}
+        {m.statFound}
+      </span>
+      <span>
+        <RollingCount value={total} className="font-bold text-white" /> {m.statTracked}
+      </span>
+    </div>
+  );
+}
+
+function HeroCountsSkeleton() {
+  return (
+    <div className="mt-4 flex items-center gap-2 text-sm text-white/70">
+      <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+      <span className="inline-block h-4 w-48 animate-pulse rounded bg-white/15" />
+    </div>
+  );
+}
+
+async function Overview({ lang, m }: { lang: Lang; m: Messages }) {
+  const { kpis, official } = await getDirectory();
+  return <KpiHeader lang={lang} m={m} kpis={kpis} official={official} />;
+}
+
+function OverviewSkeleton({ m }: { m: Messages }) {
+  return (
+    <section className="border-b border-slate-200 bg-slate-100">
+      <div className="mx-auto max-w-6xl px-4 py-6">
+        <div className="mb-3 flex items-center gap-2 text-sm font-bold uppercase tracking-wide text-slate-400">
+          <span className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-slate-300 border-t-slate-500" />
+          {m.kpiTitle}
+        </div>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div
+              key={i}
+              className="h-20 animate-pulse rounded-xl border border-slate-200 bg-white"
+            />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+async function LiveUpdates({ lang, m }: { lang: Lang; m: Messages }) {
+  const { updates } = await getDirectory();
+  return <LiveUpdatesPanel m={m} lang={lang} items={updates} />;
+}
+
+async function Results({ lang, m }: { lang: Lang; m: Messages }) {
+  const { merged, deceased } = await getDirectory();
+  return (
+    <SearchRescue
+      m={m}
+      lang={lang}
+      missing={merged.missing}
+      found={merged.found}
+      deceased={deceased}
+      forms={merged.forms}
+    />
+  );
+}
+
+function ResultsSkeleton({ m }: { m: Messages }) {
+  return (
+    <div>
+      <div className="mb-4 flex items-center gap-2 text-sm text-slate-500">
+        <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-slate-200 border-t-brand" />
+        {m.resultsLoading}
+      </div>
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div
+            key={i}
+            className="h-36 animate-pulse rounded-xl border border-slate-200 bg-white"
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+async function Hospitals({ lang, m }: { lang: Lang; m: Messages }) {
+  const { hospitalStats } = await getDirectory();
+  return <HospitalSection lang={lang} m={m} stats={hospitalStats} />;
 }
