@@ -1,6 +1,7 @@
 import LanguageToggle from "./LanguageToggle";
 import NepalFlag from "./NepalFlag";
 import HeroSearch from "./HeroSearch";
+import RollingCount from "./RollingCount";
 import type { Lang, Messages } from "@/lib/i18n";
 import { formatDateTime } from "@/lib/format";
 
@@ -143,21 +144,15 @@ export default function Hero({
           {/* Counts */}
           <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-white/80">
             <span>
-              <strong className="font-bold text-white">
-                {counts.missing.toLocaleString()}
-              </strong>{" "}
+              <RollingCount value={counts.missing} className="font-bold text-white" />{" "}
               {m.statMissing}
             </span>
             <span>
-              <strong className="font-bold text-white">
-                {counts.found.toLocaleString()}
-              </strong>{" "}
+              <RollingCount value={counts.found} className="font-bold text-white" />{" "}
               {m.statFound}
             </span>
             <span>
-              <strong className="font-bold text-white">
-                {total.toLocaleString()}
-              </strong>{" "}
+              <RollingCount value={total} className="font-bold text-white" />{" "}
               {m.statTracked}
             </span>
           </div>

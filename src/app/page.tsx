@@ -1,7 +1,7 @@
 import { getFeed } from "@/lib/feed";
 import { getRivers } from "@/lib/rivers";
 import { getRecentUpdates } from "@/lib/updates";
-import { getNdrrmaRescued } from "@/lib/ndrrma";
+import { getNdrrmaRescued, getNdrrmaMissing } from "@/lib/ndrrma";
 import { getBulletinRescued, getHospitalStats } from "@/lib/bulletin";
 import { getPoliceBodies } from "@/lib/police";
 import { getDaoRescued } from "@/lib/dao";
@@ -35,14 +35,16 @@ export default async function Page({
   const lang: Lang = isLang(searchParams.lang) ? searchParams.lang : "en";
   const m = getMessages(lang);
 
-  const [feed, rivers, updates, ndrrma, bulletin, police] = await Promise.all([
-    getFeed(),
-    getRivers(), // still used for the situation KPI (rivers above warning)
-    getRecentUpdates(),
-    getNdrrmaRescued(),
-    getBulletinRescued(), // official rescue lists parsed from the bulletin (when present)
-    getPoliceBodies(), // Nepal Police unidentified recovered bodies
-  ]);
+  const [feed, rivers, updates, ndrrma, ndrrmaMissing, bulletin, police] =
+    await Promise.all([
+      getFeed(),
+      getRivers(), // still used for the situation KPI (rivers above warning)
+      getRecentUpdates(),
+      getNdrrmaRescued(),
+      getNdrrmaMissing(), // official NDRRMA missing-persons list
+      getBulletinRescued(), // official rescue lists parsed from the bulletin (when present)
+      getPoliceBodies(), // Nepal Police unidentified recovered bodies
+    ]);
 
   const hospitalStats = await getHospitalStats(); // reuses the cached bulletin HTML
 
@@ -70,7 +72,7 @@ export default async function Page({
     feed.found,
     getDaoRescued(),
   ]);
-  const missingRaw = dedupePeople([feed.missing]);
+  const missingRaw = dedupePeople([ndrrmaMissing, feed.missing]);
 
   // Flag anyone in the missing list who also appears in the rescued list with
   // the same name + age — they may already be safe. Soft hint ("may…, check"),
