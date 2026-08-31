@@ -13,6 +13,7 @@ import HospitalSection from "@/components/HospitalSection";
 import KailashAlert from "@/components/KailashAlert";
 import DonationSection from "@/components/DonationSection";
 import Footer from "@/components/Footer";
+import { searchPeople } from "@/lib/searchPeople";
 
 export const dynamic = "force-dynamic";
 // The rescued list pages through the NDRRMA API sequentially; give the render
@@ -167,14 +168,22 @@ async function LiveUpdates({ lang, m }: { lang: Lang; m: Messages }) {
 
 async function Results({ lang, m }: { lang: Lang; m: Messages }) {
   const { merged, deceased } = await getDirectory();
+  const initial = searchPeople({
+    q: "",
+    tab: "all",
+    country: "all",
+    rescueStatus: "all",
+    page: 1,
+    missing: merged.missing,
+    found: merged.found,
+    deceased,
+  });
   return (
     <SearchRescue
       m={m}
       lang={lang}
-      missing={merged.missing}
-      found={merged.found}
-      deceased={deceased}
       forms={merged.forms}
+      initial={initial}
     />
   );
 }

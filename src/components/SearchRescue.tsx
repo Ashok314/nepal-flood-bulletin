@@ -1,115 +1,81 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import type { Person } from "@/lib/feed";
+import { useEffect, useRef, useState } from "react";
 import type { Lang, Messages } from "@/lib/i18n";
-import { romanKey } from "@/lib/translit";
+import type { SearchResponse, SearchTab } from "@/lib/searchPeople";
 import { useSearchQuery } from "@/lib/searchStore";
 import PersonCard from "./PersonCard";
-
-type Tab = "all" | "missing" | "found" | "deceased";
-
-const PAGE_SIZE = 24;
 
 export default function SearchRescue({
   m,
   lang,
-  missing,
-  found,
-  deceased = [],
   forms,
+  initial,
 }: {
   m: Messages;
   lang: Lang;
-  missing: Person[];
-  found: Person[];
-  deceased?: Person[];
   forms: { missing: string | null; found: string | null };
+  initial: SearchResponse;
 }) {
-  const [tab, setTab] = useState<Tab>("all");
+  const [tab, setTab] = useState<SearchTab>("all");
   const [q, setQ] = useSearchQuery(); // shared with the hero search box
   const [country, setCountry] = useState("all");
   const [rescueStatus, setRescueStatus] = useState("all");
   const [page, setPage] = useState(1);
+  const [data, setData] = useState<SearchResponse>(initial);
+  const [loading, setLoading] = useState(false);
   const topRef = useRef<HTMLDivElement>(null);
-
-  const list =
-    tab === "missing"
-      ? missing
-      : tab === "found"
-        ? found
-        : tab === "deceased"
-          ? deceased
-          : [...missing, ...found, ...deceased];
-
-  // Precompute a plain blob + a romanized phonetic key per person, so Devanagari
-  // names are searchable by romanized text (e.g. "binod" finds बिनोद).
-  const indexed = useMemo(
-    () =>
-      list.map((p) => {
-        const blob = [p.name, p.nameEn, p.place, p.phone, p.note, p.when]
-          .filter(Boolean)
-          .join(" ");
-        return { p, plain: blob.toLowerCase(), key: romanKey(blob) };
-      }),
-    [list],
-  );
-
-  // Countries present in this list, with counts. Nepal first, Foreign last.
-  const countryOptions = useMemo(() => {
-    const counts = new Map<string, number>();
-    for (const p of list) {
-      if (p.country) counts.set(p.country, (counts.get(p.country) || 0) + 1);
-    }
-    const rank = (c: string) => (c === "Nepal" ? 0 : c === "Foreign" ? 2 : 1);
-    return [...counts.entries()].sort((a, b) =>
-      rank(a[0]) !== rank(b[0])
-        ? rank(a[0]) - rank(b[0])
-        : a[0].localeCompare(b[0]),
-    );
-  }, [list]);
-
-  // Rescue statuses present (Safe / Injured / Under Medical Care / …), with counts.
-  const statusOptions = useMemo(() => {
-    const counts = new Map<string, number>();
-    for (const p of list) {
-      if (p.rescueStatus)
-        counts.set(p.rescueStatus, (counts.get(p.rescueStatus) || 0) + 1);
-    }
-    return [...counts.entries()].sort((a, b) => b[1] - a[1]);
-  }, [list]);
-
-  // Rank results: exact text matches first, then fuzzy / transliteration
-  // (romanized) matches. Both are shown so a spelling/script difference never
-  // hides someone — but the fuzzy ones are surfaced with a caution.
-  const { results, fuzzyCount } = useMemo(() => {
-    const raw = q.trim();
-    const base = indexed
-      .filter((a) => country === "all" || a.p.country === country)
-      .filter(
-        (a) => rescueStatus === "all" || a.p.rescueStatus === rescueStatus,
-      );
-    if (!raw) return { results: base.map((a) => a.p), fuzzyCount: 0 };
-    const plainQ = raw.toLowerCase();
-    const qWords = romanKey(raw).split(" ").filter(Boolean);
-    const exact: Person[] = [];
-    const fuzzy: Person[] = [];
-    for (const a of base) {
-      if (a.plain.includes(plainQ)) exact.push(a.p);
-      else if (qWords.length > 0 && qWords.every((w) => a.key.includes(w)))
-        fuzzy.push(a.p);
-    }
-    return { results: [...exact, ...fuzzy], fuzzyCount: fuzzy.length };
-  }, [q, country, rescueStatus, indexed]);
+  const firstLoad = useRef(true);
 
   // Reset page on any filter change; reset filters when switching tabs.
   useEffect(() => {
     setPage(1);
   }, [q, tab, country, rescueStatus]);
+
   useEffect(() => {
     setCountry("all");
     setRescueStatus("all");
   }, [tab]);
+
+  useEffect(() => {
+    if (
+      firstLoad.current &&
+      !q.trim() &&
+      tab === "all" &&
+      country === "all" &&
+      rescueStatus === "all" &&
+      page === 1
+    ) {
+      firstLoad.current = false;
+      return;
+    }
+    firstLoad.current = false;
+
+    const controller = new AbortController();
+    const params = new URLSearchParams({
+      q,
+      tab,
+      country,
+      rescueStatus,
+      page: String(page),
+    });
+
+    setLoading(true);
+    fetch(`/api/search?${params.toString()}`, { signal: controller.signal })
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json() as Promise<SearchResponse>;
+      })
+      .then(setData)
+      .catch((err) => {
+        if (err?.name !== "AbortError") console.error(err);
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setLoading(false);
+      });
+
+    return () => controller.abort();
+  }, [q, tab, country, rescueStatus, page]);
 
   function statusLabel(s: string) {
     const ne: Record<string, string> = {
@@ -126,16 +92,13 @@ export default function SearchRescue({
     return c === "Nepal" ? m.countryNepal : c === "Foreign" ? m.countryForeign : c;
   }
 
-  const total = results.length;
-  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
-  const current = Math.min(page, totalPages);
-  const start = (current - 1) * PAGE_SIZE;
-  const pageItems = results.slice(start, start + PAGE_SIZE);
-
   function goTo(p: number) {
     setPage(p);
     topRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
+
+  const start = data.total === 0 ? 0 : (data.page - 1) * 24 + 1;
+  const end = start + data.results.length - 1;
 
   return (
     <div ref={topRef}>
@@ -146,25 +109,29 @@ export default function SearchRescue({
             {m.filterAll}
             <Count
               active={tab === "all"}
-              n={missing.length + found.length}
+              n={data.counts.missing + data.counts.found + data.counts.deceased}
               tone="slate"
             />
           </TabButton>
           <TabButton active={tab === "missing"} onClick={() => setTab("missing")}>
             {m.tabMissing}
-            <Count active={tab === "missing"} n={missing.length} tone="rose" />
+            <Count active={tab === "missing"} n={data.counts.missing} tone="rose" />
           </TabButton>
           <TabButton active={tab === "found"} onClick={() => setTab("found")}>
             {m.tabFound}
-            <Count active={tab === "found"} n={found.length} tone="emerald" />
+            <Count active={tab === "found"} n={data.counts.found} tone="emerald" />
           </TabButton>
-          {deceased.length > 0 && (
+          {data.counts.deceased > 0 && (
             <TabButton
               active={tab === "deceased"}
               onClick={() => setTab("deceased")}
             >
               {m.tabDeceased}
-              <Count active={tab === "deceased"} n={deceased.length} tone="slate" />
+              <Count
+                active={tab === "deceased"}
+                n={data.counts.deceased}
+                tone="slate"
+              />
             </TabButton>
           )}
         </div>
@@ -224,9 +191,9 @@ export default function SearchRescue({
       </div>
 
       {/* Filters: country + rescue status */}
-      {(countryOptions.length > 1 || statusOptions.length > 0) && (
+      {(data.countries.length > 1 || data.rescueStatuses.length > 0) && (
         <div className="mb-3 flex flex-wrap items-center gap-x-4 gap-y-2">
-          {countryOptions.length > 1 && (
+          {data.countries.length > 1 && (
             <div className="flex items-center gap-2">
               <label
                 htmlFor="country-filter"
@@ -240,10 +207,8 @@ export default function SearchRescue({
                 onChange={(e) => setCountry(e.target.value)}
                 className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm shadow-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20"
               >
-                <option value="all">
-                  {m.filterAll} ({list.length})
-                </option>
-                {countryOptions.map(([c, n]) => (
+                <option value="all">{m.filterAll}</option>
+                {data.countries.map(([c, n]) => (
                   <option key={c} value={c}>
                     {countryLabel(c)} ({n})
                   </option>
@@ -251,7 +216,7 @@ export default function SearchRescue({
               </select>
             </div>
           )}
-          {statusOptions.length > 0 && (
+          {data.rescueStatuses.length > 0 && (
             <div className="flex items-center gap-2">
               <label
                 htmlFor="status-filter"
@@ -266,7 +231,7 @@ export default function SearchRescue({
                 className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm shadow-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20"
               >
                 <option value="all">{m.filterAll}</option>
-                {statusOptions.map(([s, n]) => (
+                {data.rescueStatuses.map(([s, n]) => (
                   <option key={s} value={s}>
                     {statusLabel(s)} ({n})
                   </option>
@@ -283,7 +248,7 @@ export default function SearchRescue({
         </p>
       )}
 
-      {q.trim() !== "" && fuzzyCount > 0 && (
+      {q.trim() !== "" && data.fuzzyCount > 0 && (
         <p className="mb-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
           {m.fuzzyNote}
         </p>
@@ -291,25 +256,32 @@ export default function SearchRescue({
 
       {/* Result summary */}
       <p className="mb-3 text-sm text-slate-500">
-        {total === 0
-          ? m.noResults
-          : `${m.showing} ${start + 1}–${start + pageItems.length} ${m.of} ${total} ${m.resultsCount}`}
+        {loading
+          ? m.resultsLoading
+          : data.total === 0
+            ? m.noResults
+            : `${m.showing} ${start}–${end} ${m.of} ${data.total} ${m.resultsCount}`}
       </p>
 
-      {total === 0 ? (
+      {data.total === 0 ? (
         <p className="rounded-lg border border-dashed border-slate-300 bg-white p-8 text-center text-slate-500">
           {m.noResults}
         </p>
       ) : (
         <>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {pageItems.map((p) => (
+          <div className={`grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 ${loading ? "opacity-60" : ""}`}>
+            {data.results.map((p) => (
               <PersonCard key={p.id} person={p} m={m} lang={lang} />
             ))}
           </div>
 
-          {totalPages > 1 && (
-            <Pagination current={current} totalPages={totalPages} onGo={goTo} m={m} />
+          {data.totalPages > 1 && (
+            <Pagination
+              current={data.page}
+              totalPages={data.totalPages}
+              onGo={goTo}
+              m={m}
+            />
           )}
         </>
       )}
