@@ -7,19 +7,39 @@ import { detectCountry } from "@/lib/derive";
  * These populate the "Rescued & safe" list, each tagged with the NDRRMA source.
  */
 
-const API = "https://ndrrma.gov.np/api/v1/rescues/rescued-persons/?limit=-1";
+const BASE = "https://ndrrma.gov.np/api/v1/rescues/rescued-persons/";
+const PAGE = 500; // limit=-1 truncates the response (~400KB), so we paginate
 const SOURCE = { label: "NDRRMA", url: "https://ndrrma.gov.np/np/misc-report/380" };
 
 const TTL_MS = 10 * 60 * 1000;
 const MIN_GAP_MS = 60_000;
-const TIMEOUT_MS = 10_000;
+const TIMEOUT_MS = 15_000;
 
 let cache: { people: Person[]; at: number } | null = null;
 let lastAttempt = 0;
 
+async function fetchPage(
+  offset: number,
+  signal: AbortSignal,
+): Promise<{ rows: unknown[]; count: number }> {
+  const res = await fetch(`${BASE}?limit=${PAGE}&offset=${offset}`, {
+    signal,
+    cache: "no-store",
+    headers: { accept: "application/json" },
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const json = await res.json();
+  return {
+    rows: Array.isArray(json?.results) ? json.results : [],
+    count: Number(json?.count) || 0,
+  };
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function normalize(rows: any[]): Person[] {
-  return rows.map((r) => {
+  return rows
+    .filter((r) => String(r?.name_ne ?? "").trim() || String(r?.name ?? "").trim())
+    .map((r) => {
     const nameEn = String(r?.name ?? "").trim();
     const nameNe = String(r?.name_ne ?? "").trim();
     const display = nameNe || nameEn || "-";
@@ -64,20 +84,23 @@ export async function getNdrrmaRescued(): Promise<Person[]> {
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
   lastAttempt = Date.now();
   try {
-    const res = await fetch(API, {
-      signal: controller.signal,
-      cache: "no-store",
-      headers: { accept: "application/json" },
-    });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const json = await res.json();
-    const rows = Array.isArray(json?.results)
-      ? json.results
-      : Array.isArray(json)
-        ? json
-        : [];
+    // First page gives us the total count; fetch the rest by offset in parallel.
+    const first = await fetchPage(0, controller.signal);
+    let rows = first.rows;
+    if (first.count > PAGE) {
+      const offsets: number[] = [];
+      for (let o = PAGE; o < first.count; o += PAGE) offsets.push(o);
+      const rest = await Promise.all(
+        offsets.map((o) =>
+          fetchPage(o, controller.signal)
+            .then((p) => p.rows)
+            .catch(() => [] as unknown[]),
+        ),
+      );
+      rows = rows.concat(...rest);
+    }
     const people = normalize(rows);
-    cache = { people, at: Date.now() };
+    if (people.length) cache = { people, at: Date.now() };
     return people;
   } catch {
     return cache?.people ?? [];
