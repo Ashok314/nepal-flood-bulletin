@@ -34,8 +34,7 @@ src/
 ├── app/
 │   └── page.tsx          # Fetches, merges, deduplicates, and renders data
 ├── lib/
-│   ├── setu.ts           # NDRRMA SETU registry
-│   ├── ndrrma.ts         # NDRRMA rescued-persons API
+│   ├── ndrrma.ts         # NDRRMA rescued + missing person APIs
 │   ├── bulletin.ts       # Rasuwa Flood Bulletin and hospital totals
 │   ├── police.ts         # Nepal Police unidentified bodies
 │   ├── tweetRescued.ts   # Hand-transcribed official snapshots

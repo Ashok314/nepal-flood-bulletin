@@ -16,9 +16,9 @@ across a dozen websites, X posts and PDFs to look for one person.
 ## Why this exists
 
 When the flood hit, person-level information was scattered everywhere — NDRRMA,
-the NDRRMA **SETU** registry, Nepal Police (unidentified bodies), hospitals via
-HEOC, the PM's office rescue portal, embassies, news outlets, and a community
-bulletin. A family looking for **one** relative had to check **all** of them.
+Nepal Police (unidentified bodies), hospitals via HEOC, the PM's office rescue
+portal, embassies, news outlets, and a community bulletin. A family looking for
+**one** relative had to check **all** of them.
 
 This site aggregates those into one fast, bilingual search — every record keeps
 its own source and links back to it.
@@ -121,5 +121,5 @@ under the same license.
 ---
 
 Built by [@yash_paudel](https://x.com/yash_paudel) & [@sanzinme](https://x.com/sanzinme).
-Data from NDRRMA, SETU, Nepal Police, HEOC, DAO offices, MoFA, DHM, and the
+Data from NDRRMA, Nepal Police, HEOC, DAO offices, MoFA, DHM, and the
 Rasuwa Flood Bulletin by Niraj Bhusal.
