@@ -8,12 +8,15 @@ import { detectCountry } from "@/lib/derive";
  */
 
 const BASE = "https://ndrrma.gov.np/api/v1/rescues/rescued-persons/";
-const PAGE = 500; // limit=-1 truncates the response (~400KB), so we paginate
+// limit=-1 (and limits >~1500) truncate the response, so we paginate at a size
+// that always returns valid JSON. NDRRMA also throttles *concurrent* requests
+// from one IP (7 parallel took ~13s), so we page through them sequentially.
+const PAGE = 1000;
 const SOURCE = { label: "NDRRMA", url: "https://ndrrma.gov.np/np/misc-report/380" };
 
 const TTL_MS = 10 * 60 * 1000;
 const MIN_GAP_MS = 60_000;
-const TIMEOUT_MS = 15_000;
+const TIMEOUT_MS = 30_000;
 
 let cache: { people: Person[]; at: number } | null = null;
 let lastAttempt = 0;
@@ -84,20 +87,18 @@ export async function getNdrrmaRescued(): Promise<Person[]> {
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
   lastAttempt = Date.now();
   try {
-    // First page gives us the total count; fetch the rest by offset in parallel.
+    // First page gives us the total count; page through the rest sequentially
+    // (NDRRMA rejects/throttles concurrent requests). Keep whatever we've
+    // gathered if a later page fails.
     const first = await fetchPage(0, controller.signal);
     let rows = first.rows;
-    if (first.count > PAGE) {
-      const offsets: number[] = [];
-      for (let o = PAGE; o < first.count; o += PAGE) offsets.push(o);
-      const rest = await Promise.all(
-        offsets.map((o) =>
-          fetchPage(o, controller.signal)
-            .then((p) => p.rows)
-            .catch(() => [] as unknown[]),
-        ),
-      );
-      rows = rows.concat(...rest);
+    for (let o = PAGE; o < first.count; o += PAGE) {
+      try {
+        const p = await fetchPage(o, controller.signal);
+        rows = rows.concat(p.rows);
+      } catch {
+        break;
+      }
     }
     const people = normalize(rows);
     if (people.length) cache = { people, at: Date.now() };

@@ -23,6 +23,9 @@ import DonationSection from "@/components/DonationSection";
 import Footer from "@/components/Footer";
 
 export const dynamic = "force-dynamic";
+// The rescued list pages through the NDRRMA API sequentially; give the render
+// enough head-room on Vercel (the default 10s can cut the fetch short).
+export const maxDuration = 60;
 
 export default async function Page({
   searchParams,
