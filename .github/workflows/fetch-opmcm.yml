@@ -19,8 +19,10 @@ jobs:
         with:
           node-version: 20
 
+      - run: npm ci
+
       - name: Fetch OPMCM reports
-        run: node scripts/fetch-opmcm.mjs
+        run: npx tsx scripts/fetch-opmcm.ts
 
       - name: Commit updated data
         run: |
