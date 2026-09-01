@@ -16,14 +16,20 @@ import { romanKey } from "@/lib/translit";
 import { deriveKpis } from "@/lib/metrics";
 import type { Person } from "@/lib/feed";
 
-// Dedupe by romanized name + age so a person listed in several places shows
-// once (first occurrence wins — official sources first).
+// Dedupe repeated entries from the same source without hiding matching records
+// reported by another source.
 function dedupePeople(lists: Person[][]): Person[] {
   const seen = new Set<string>();
   const out: Person[] = [];
   for (const list of lists) {
     for (const p of list) {
-      const key = `${romanKey(p.name)}|${p.age || ""}`;
+      const name = romanKey(p.name)
+        .split(" ")
+        .filter(Boolean)
+        .sort()
+        .join(" ");
+      const source = p.source?.label || p.source?.url || "";
+      const key = `${p.status}|${source}|${name}|${p.age || ""}`;
       if (p.name && p.name !== "-" && seen.has(key)) continue;
       seen.add(key);
       out.push(p);
