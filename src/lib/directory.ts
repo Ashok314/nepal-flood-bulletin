@@ -58,15 +58,21 @@ export const getDirectory = cache(async () => {
     ]);
   const hospitalStats = await getHospitalStats();
 
+  const ndrrmaIds = new Set([
+    ...ndrrma.map((p) => p.id.replace(/^ndrrma-/, "")),
+    ...ndrrmaMissing.map((p) => p.id.replace(/^ndrrma-miss-/, "")),
+  ]);
+  const notInNdrrma = (p: Person) => !p.ndrrmaId || !ndrrmaIds.has(p.ndrrmaId);
+
   const found = dedupePeople([
     ndrrma,
     bulletin,
     getTweetRescued(),
     feed.found,
     getDaoRescued(),
-    opmcm.found,
+    opmcm.found.filter(notInNdrrma),
   ]);
-  const missingRaw = dedupePeople([ndrrmaMissing, feed.missing, opmcm.missing]);
+  const missingRaw = dedupePeople([ndrrmaMissing, feed.missing, opmcm.missing.filter(notInNdrrma)]);
 
   // Flag anyone in the missing list who also appears in the rescued list
   // (same name + age) — they may already be safe.
@@ -79,14 +85,19 @@ export const getDirectory = cache(async () => {
       : p,
   );
 
-  const deceased = police; // unidentified recovered bodies — never name-deduped
+  const deceased = police;
+  const kpiMissing = missing.filter((p) => p.floodLinked !== false);
+  const kpiFound = found.filter((p) => p.floodLinked !== false);
   const merged = {
     ...feed,
     missing,
     found,
     counts: { missing: missing.length, found: found.length },
   };
-  const kpis = deriveKpis(merged, rivers);
+  const kpis = deriveKpis(
+    { ...merged, missing: kpiMissing, found: kpiFound, counts: { missing: kpiMissing.length, found: kpiFound.length } },
+    rivers,
+  );
 
   return { feed, updates, merged, deceased, hospitalStats, kpis, official };
 });

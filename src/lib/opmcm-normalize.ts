@@ -13,7 +13,32 @@ export type OpmcmReport = {
   eventAt?: string | null;
   description?: string | null;
   imageUrl?: string | null;
+  isDuplicate?: boolean | null;
+  source?: string | null;
+  ndrrmaId?: number | null;
+  importRef?: string | null;
 };
+
+const FLOOD_SOURCE_TAGS = new Set(["setu", "ndrrma-rescued", "flood-victims-tracking"]);
+
+const FLOOD_DISTRICT_KEYWORDS = [
+  "rasuwa", "nuwakot", "sindhupalchok", "dhading",
+  "रसुवा", "नुवाकोट", "सिन्धुपाल्चोक", "धादिङ",
+];
+
+function isFloodLinked(raw: OpmcmReport): boolean {
+  const src = (raw.source ?? "").toLowerCase().trim();
+  if (FLOOD_SOURCE_TAGS.has(src)) return true;
+  const ref = (raw.importRef ?? "").toLowerCase();
+  if (
+    ref.startsWith("ndrrma-rescued:") ||
+    ref.startsWith("setu:") ||
+    ref.startsWith("flood-victims-tracking:")
+  )
+    return true;
+  const blob = `${raw.locationText ?? ""} ${raw.description ?? ""}`.toLowerCase();
+  return FLOOD_DISTRICT_KEYWORDS.some((kw) => blob.includes(kw));
+}
 
 function statusFrom(type?: string): PersonStatus | null {
   if (type === "lost") return "missing";
@@ -31,6 +56,8 @@ function reportUrl(id?: string): string {
 }
 
 function normalizeReport(raw: OpmcmReport, index: number): Person | null {
+  if (raw.isDuplicate) return null;
+
   const status = statusFrom(raw.type);
   if (!status) return null;
 
@@ -57,6 +84,8 @@ function normalizeReport(raw: OpmcmReport, index: number): Person | null {
         : "Nepal"),
     rescueStatus: status === "found" ? "Community-reported found" : undefined,
     status,
+    ndrrmaId: raw.ndrrmaId != null ? String(raw.ndrrmaId) : undefined,
+    floodLinked: isFloodLinked(raw),
   };
 }
 
