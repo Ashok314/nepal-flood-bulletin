@@ -55,6 +55,7 @@ function normalizeReport(raw: OpmcmReport, index: number): Person | null {
       (isForeign({ name, place: raw.locationText || undefined, note: raw.description || undefined })
         ? "Foreign"
         : "Nepal"),
+    rescueStatus: status === "found" ? "Community-reported found" : undefined,
     status,
   };
 }

@@ -61,12 +61,12 @@ export const getDirectory = cache(async () => {
   const found = dedupePeople([
     ndrrma,
     bulletin,
-    opmcm.found,
     getTweetRescued(),
     feed.found,
     getDaoRescued(),
+    opmcm.found,
   ]);
-  const missingRaw = dedupePeople([ndrrmaMissing, opmcm.missing, feed.missing]);
+  const missingRaw = dedupePeople([ndrrmaMissing, feed.missing, opmcm.missing]);
 
   // Flag anyone in the missing list who also appears in the rescued list
   // (same name + age) — they may already be safe.
