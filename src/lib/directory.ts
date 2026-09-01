@@ -11,6 +11,7 @@ import { getBulletinRescued, getHospitalStats } from "@/lib/bulletin";
 import { getPoliceBodies } from "@/lib/police";
 import { getDaoRescued } from "@/lib/dao";
 import { getTweetRescued } from "@/lib/tweetRescued";
+import { getOpmcmPeople } from "@/lib/opmcm";
 import { romanKey } from "@/lib/translit";
 import { deriveKpis } from "@/lib/metrics";
 import type { Person } from "@/lib/feed";
@@ -37,7 +38,7 @@ function dedupePeople(lists: Person[][]): Person[] {
  * a single computation per request instead of each re-fetching.
  */
 export const getDirectory = cache(async () => {
-  const [feed, rivers, updates, ndrrma, ndrrmaMissing, bulletin, police, official] =
+  const [feed, rivers, updates, ndrrma, ndrrmaMissing, bulletin, police, official, opmcm] =
     await Promise.all([
       getFeed(),
       getRivers(),
@@ -47,17 +48,19 @@ export const getDirectory = cache(async () => {
       getBulletinRescued(),
       getPoliceBodies(),
       getNdrrmaCounts(), // official aggregate totals (tiny, reliable)
+      getOpmcmPeople(),
     ]);
   const hospitalStats = await getHospitalStats();
 
   const found = dedupePeople([
     ndrrma,
     bulletin,
+    opmcm.found,
     getTweetRescued(),
     feed.found,
     getDaoRescued(),
   ]);
-  const missingRaw = dedupePeople([ndrrmaMissing, feed.missing]);
+  const missingRaw = dedupePeople([ndrrmaMissing, opmcm.missing, feed.missing]);
 
   // Flag anyone in the missing list who also appears in the rescued list
   // (same name + age) — they may already be safe.
