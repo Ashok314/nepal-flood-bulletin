@@ -86,16 +86,30 @@ export const getDirectory = cache(async () => {
   );
 
   const deceased = police;
-  const kpiMissing = missing.filter((p) => p.floodLinked !== false);
-  const kpiFound = found.filter((p) => p.floodLinked !== false);
+
+  // OPMCM stays fully searchable (it's in `missing`/`found` above), but it never
+  // feeds the headline. The hero counts and the KPI reflect only our curated /
+  // official sources, so the site never claims, say, ~10k "missing" sourced from
+  // a crowd-aggregated national registry. OPMCM records still surface by name for
+  // any family searching, each carrying its own "national registry" label.
+  const isOpmcm = (p: Person) => p.source?.label === "OPMCM Lost & Found";
+  const curatedMissing = missing.filter((p) => !isOpmcm(p));
+  const curatedFound = found.filter((p) => !isOpmcm(p));
+
   const merged = {
     ...feed,
     missing,
     found,
-    counts: { missing: missing.length, found: found.length },
+    // Headline counts: curated sources only (OPMCM is searchable, not counted).
+    counts: { missing: curatedMissing.length, found: curatedFound.length },
   };
   const kpis = deriveKpis(
-    { ...merged, missing: kpiMissing, found: kpiFound, counts: { missing: kpiMissing.length, found: kpiFound.length } },
+    {
+      ...merged,
+      missing: curatedMissing,
+      found: curatedFound,
+      counts: { missing: curatedMissing.length, found: curatedFound.length },
+    },
     rivers,
   );
 
